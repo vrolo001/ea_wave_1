@@ -1,0 +1,37 @@
+---
+title: "Sums and Means"
+format: html
+---
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+responses <- factor(sample(1:5, 500, replace = TRUE), 
+                    levels = 1:5, 
+                    labels = c("Disagree", "Slightly Disagree", "Neutral", "Slightly Agree", "Agree"))
+
+# Create the dataframe
+data_df <- data.frame(x_1 = responses,
+                      x_2 = responses,
+                      x_3 = responses,
+                      x_4 = responses,
+                      x_5 = responses)
+```
+
+## score by summing
+
+```{r}
+data_df <- data_df %>%
+  mutate(x_sum = rowSums(across(starts_with("x_"), ~ as.numeric(.))))
+```
+
+## score by mean
+
+```{r}
+data_df <- data_df %>%
+  mutate(x_mean = rowMeans(across(starts_with("x_"), ~ as.numeric(.))))
+```
+
+

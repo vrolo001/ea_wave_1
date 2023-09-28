@@ -1,0 +1,39 @@
+---
+title: "Survey 1 Scoring"
+format: html
+editor: visual
+---
+
+This file scores the coded responses into our final variables. Rune this ***AFTER*** running survey_1_coding.qmd.
+
+### Load packages and data
+
+#### Libraries & Function
+
+```{r}
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+```
+
+#### Load coded data
+
+```{r}
+survey1 <- read.csv("survey_1_coded.csv")
+```
+
+
+
+## Morals and Values Variables
+
+### Individualism & Collectivism
+
+```{r}
+
+indiv_collectivism <- 
+
+```
+

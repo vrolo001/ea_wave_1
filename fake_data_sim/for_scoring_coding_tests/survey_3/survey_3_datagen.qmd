@@ -1,0 +1,374 @@
+---
+title: "Survey 3: Data Simulation (coding/scoring)"
+format: html
+editor: visual
+---
+
+This document includes the code to simulate a dataset for Survey 3 of Wave 1 of the Explaining Atheism project.
+
+Survey 3 includes the Socialisation cluster of variables, along with some response variables. We will generate the dataset with our custom easim function.
+
+## Load packages and functions
+
+Here we load dyplr, and our custom function. We use groundhog for reproducibility
+
+```{r}
+
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+
+source("../datasim.R")
+easim <- easim_odd  #to overwrite the easim we loaded with the easim_odd (so we get alternating cols) rather than changing all the code below to easim_odd
+
+
+set.seed(1993)
+```
+
+## Create df and demographics
+
+```{r}
+# data frame with ID, Sex, and Age variables
+df <- data.frame(ID = 1:700,
+                 sex = sample(c("Male", "Female"), 100, replace = TRUE),
+                 age = round(rnorm(100, mean = 30, sd = 10)), 
+                 country = sample(c("Brazil", "Japan", "UK"),
+                                  100,
+                                  replace = TRUE))
+```
+
+## CREDs
+
+The creds scale has a series of different response options, some not standard, so we need to specify these separately.
+
+### Specify response scales
+
+```{r}
+
+
+yesno <- c("Yes", "No")
+
+sincerity <- c("Completely Insincere",
+               "Very Insincere",
+               "Insincere",
+               "Neutral",
+               "Sincere",
+               "Very Sincere",
+               "Completely Sincere")
+
+extent <- c("1 - To No Extent At All",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7 - To a Great Extent")
+
+frequency <- c("Never",
+               "Very Infrequently",
+               "Infrequently",
+               "Sometimes",
+               "Frequently",
+               "Very Frequently",
+               "Always")
+
+```
+
+*cred_01:06*
+
+These use the same scale so we can use easim_odd
+
+```{r}
+
+df <- easim_odd(df, 6, "cred_", "agreement", 700)
+```
+
+*cred_07* has yes/no responses
+
+```{r}
+df$cred_07 <- rep(yesno)
+
+```
+
+*cred_09*
+
+```{r}
+
+df$cred_09 <- rep(yesno)
+
+```
+
+*cred_10*
+
+```{r}
+
+df$cred_10 <- rep(sincerity)
+
+```
+
+*cred_11*
+
+```{r}
+
+df$cred_11 <- rep(extent)
+
+```
+
+*cred_12*
+
+```{r}
+
+df$cred_12 <- rep(sincerity)
+
+```
+
+*cred_13, cred_14*
+
+```{r}
+df$cred_13 <- rep(extent)
+
+df$cred_14 <- rep(extent)
+
+```
+
+*cred_15*
+
+```{r}
+df$cred_15 <- rep(frequency)
+```
+
+```{r}
+df$cred_16 <- rep(extent)
+```
+
+*cred_27*
+
+```{r}
+df$cred_27 <- rep(extent)
+```
+
+*cred_28*
+
+```{r}
+df$cred_28 <- rep(sincerity)
+```
+
+*cred_30*
+
+```{r}
+df$cred_30 <- rep(extent)
+
+```
+
+*cred_31*
+
+```{r}
+df$cred_31 <- rep(sincerity)
+```
+
+## CRUDs
+
+```{r}
+
+df <- easim_odd(df, 3, "crud_",  "extent", 700)
+
+```
+
+## Non-theistic Socialisation
+
+```{r}
+
+df <- easim_odd(df, 8, "nts_",  "extent", 700)
+
+```
+
+#Normativity of Religion
+
+```{r}
+df <- easim_odd(df, 12, "norm_",  "extent", 700)
+
+```
+
+## Religious Emphasis
+
+```{r}
+
+df <- easim_odd(df, 9, "re_",  "extent", 700)
+
+```
+
+## Belief Measure Variables
+
+### ISSP
+
+As there is no reverse coding we can again use normal easim
+
+```{r}
+
+df <- easim(df,
+            1,
+            "issp_",
+            "custom",
+            700,
+            custom = c("I don't believe in God",
+                       "I don't know whether there is a God, and I don't believe there is any way to find out",
+                       "I don't believe in a personal God, but I do believe in a Higher Power of some kind",
+                       "I find myself believing in God some of the time, but not at others",
+                       "While I have doubts, I feel that I do believe in God.",
+                       "I know God really exists and I have no doubt about it.",
+                       "Don't know"
+                       ))
+
+df <- easim(df,
+            2,
+            "issp_",
+            "custom",
+            700,
+            custom = c("Spiritual but not religious",
+                       "Seeker",
+                       "Non-religious",
+                       "Atheist",
+                       "Agnostic",
+                       "Humanist",
+                       "Sceptic",
+                       "Free thinker",
+                       "Rationalist",
+                       "Secular",
+                       "Christian",
+                       "Muslim",
+                       "Jewish",
+                       "Buddhist",
+                       "Hindu",
+                       "Daoist",
+                       "Shinto",
+                       "Confucian",
+                       "Other (please specify)"
+            ), 
+            2)
+
+```
+
+### Religious Identity
+
+```{r}
+
+df <- easim(df, 1, "rid_", "yesno", 700)
+
+df <- easim(df,
+            2,
+            "rid_",
+            "custom",
+            700,
+            c("Protestant",
+              "Catholic",
+              "Orthodox (e.g. Greek Orthodox, Russian Orthodox)",
+              "Sunni",
+              "Shiite",
+              "Buddhist",
+              "Confucian",
+              "Daoist",
+              "Hindu",
+              "Jewish",
+              "Shinto",
+              "Other (please specify)"),
+            2)
+
+
+```
+
+### Religious Practice
+
+```{r}
+
+df <- easim(df,
+            1,
+            "rp_",
+            "custom",
+            700,
+            c("More than once a week",
+              "Once a week",
+              "Once a month",
+              "Only on special holy days",
+              "Once a year",
+              "Less often",
+              "Never, practically never"
+            ),
+            1)
+
+
+df <- easim(df,
+            2,
+            "rp_",
+            "custom",
+            700,
+            c("Several times a day",
+              "Once a day",
+              "Several times each week",
+              "Only when attending religious services",
+              "Only on special holy days",
+              "Once a year",
+              "Less often",
+              "Never, practically never"
+            ),
+            2)
+
+
+df <- easim(df,
+            3,
+            "rp_",
+            "custom",
+            700,
+            c("Yes, for religious reasons",
+              "Yes, for non-religious reasons",
+              "No"),
+            3)
+
+```
+
+### Supernatural Belief
+
+```{r}
+
+df <- easim(df, 15, "snb_", "agreement", 700)
+
+df <- easim(df, 16, "snb_", "custom", 700, c("Yes, I’ve had an experience like this.",
+                                            "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
+                                            "No, I’ve never had an experience like this."),
+            16)
+
+df <- easim(df, 17, "snb_", "yesno", 700, NULL,  17)
+
+
+```
+
+### General Belief
+
+```{r}
+
+df <-  easim(df, 2, "belief_", "agreement", 700)
+
+df <-  easim(df, 1, "conf_", "agreement", 700)
+
+df <-  easim(df, 1, "ar_", "agreement", 700)
+
+df <-  easim(df, 2, "apth_", "agreement", 700)
+
+df <-  easim(df, 1, "mean_", "agreement", 700)
+
+```
+
+### Atheist Membership
+
+```{r}
+
+df <- easim(df, 1, "am_", "yesno", 700)
+```
+
+## Write Datafile
+
+```{r}
+write.csv(df, "survey3_testdat_sc.csv")
+```

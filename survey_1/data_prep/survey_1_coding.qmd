@@ -1,0 +1,415 @@
+---
+title: "Survey 1 Coding"
+format: html
+editor: visual
+---
+
+The first part of this file codes the raw survey responses. The second part scores these into our final variables.
+
+### Load packages, function, and data
+
+```{r}
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+#load functions
+
+source("../../funs/scoringFuns.R")  #this function requires some tidyverse elements
+
+```
+#### Data
+
+```{r}
+survey1 <- read.csv("../../survey_1/data/fake_data/for_scoring_coding/survey1_testdat_sc.csv")
+```
+
+
+# Part 1 - Coding Survey Responses
+
+## Morals & Values Variables
+
+### Individualism and Collectivism
+
+As this uses our standard response scale for agreement we can use our standard scoring function
+
+For the first variable we run the function on survey1, from then on we run it on survey1_scored.
+
+```{r}
+
+#no items are reversed scored so we can just use the same function across all the ic items
+
+#first we select the relevant columns
+
+ic_cols <- colnames(survey1 %>%
+  select(starts_with("ic_")))
+
+# now we run the function
+
+survey1_coded <- funScore(survey1, ic_cols, "agreement", FALSE)
+
+```
+
+## Rebelliousness
+
+Rebelliousness uses our standard extent coding scheme, which is also in the standard function
+
+```{r}
+reb_cols <- colnames(survey1_coded %>%
+  select(starts_with("reb_")))
+
+survey1_coded <- funScore(survey1_coded, reb_cols, "extent", FALSE)
+```
+
+
+## Individual Choice Norms
+
+```{r}
+icn_cols <- colnames(survey1_coded %>%
+  select(starts_with("icn_")))
+
+survey1_coded <- funScore(survey1_coded, icn_cols, "agreement", FALSE)
+```
+
+## Belief Variables
+
+For most of these we want factor responses, so we use funScore2
+
+### ISSP
+
+**issp_01**
+
+```{r}
+#here we set the response options (which will be the factor levels)
+issp_01_levels  <- c(                                                                        
+  "I don't believe in God",
+  "I don't know whether there is a God, and I don't believe there is any way to find out",
+  "I don't believe in a personal God, but I do believe in a Higher Power of some kind",
+  "I find myself believing in God some of the time, but not at others",
+  "While I have doubts, I feel that I do believe in God.",
+  "I know God really exists and I have no doubt about it.",
+  "Don't know")
+
+#here we turn the variable into a factor.
+survey1_coded <- funScore2(survey1_coded, "issp_01", responsescale = "custom", customlev = issp_01_levels)
+
+```
+
+**issp_02**
+
+```{r}
+
+issp_02_levels <- c(
+  "Spiritual but not religious",
+  "Seeker",
+  "Non-religious",
+  "Atheist",
+  "Agnostic",
+  "Humanist",
+  "Sceptic",
+  "Free thinker",
+  "Rationalist",
+  "Secular",
+  "Christian",
+  "Muslim",
+  "Jewish",
+  "Buddhist",
+  "Hindu",
+  "Daoist",
+  "Shinto",
+  "Confucian",
+  "Other (please specify)")
+
+survey1_coded <- funScore2(survey1_coded, "issp_02", responsescale = "custom", customlev = issp_02_levels)
+```
+
+### Religious Identification
+
+**rid_01**
+
+We score this numerically
+
+```{r}
+survey1_coded <- funScore(survey1_coded, "rid_01", "yesno", FALSE)
+```
+
+**rid_02**
+
+
+```{r}
+rid_02_levels <- c(
+  "Protestant",
+  "Catholic",
+  "Orthodox (e.g. Greek Orthodox, Russian Orthodox)",
+  "Sunni",
+  "Shiite",
+  "Buddhist",
+  "Confucian",
+  "Daoist",
+  "Hindu",
+  "Jewish",
+  "Shinto",
+  "Other (please specify)")
+
+survey1_coded <- funScore2(survey1_coded, "rid_02", responsescale = "custom", customlev = rid_02_levels)
+```
+
+### Religious Practice
+
+These are ordered factors so we add the ordered argument.
+
+**rp_01**
+
+
+
+```{r}
+rp_01_levels <- rev(c(    #we reverse this to make the order lowest to highest
+  "More than once a week",
+  "Once a week",
+  "Once a month",
+  "Only on special holy days",
+  "Once a year",
+  "Less often",
+  "Never, practically never"
+))
+
+survey1_coded <- funScore2(survey1_coded, "rp_01", responsescale = "custom", customlev = rp_01_levels, ordered = TRUE)
+
+```
+
+**rp_02**
+
+```{r}
+rp_02_levels <- rev(c(  #we reverse this to make the order lowest to highest
+  "Several times a day",
+  "Once a day",
+  "Several times each week",
+  "Only when attending religious services",
+  "Only on special holy days",
+  "Once a year",
+  "Less often",
+  "Never, practically never"
+))
+
+survey1_coded <- funScore2(survey1_coded, "rp_02", responsescale = "custom", customlev = rp_02_levels, ordered = TRUE)
+
+```
+
+**rp_03**
+
+```{r}
+rp_03_levels <- c(
+  "Yes, for religious reasons",
+  "Yes, for non-religious reasons",
+  "No")
+  
+survey1_coded <- funScore2(survey1_coded, "rp_03", responsescale = "custom", customlev = rp_03_levels)
+```
+
+### Supernatural Belief
+
+Supernatural belief has 15 items that use the same response scale (agreement, so we will use our scoring function for this)
+
+**snb_01 : snb_15**
+
+```{r}
+snb_cols <- colnames(survey1 %>%
+  select(starts_with("snb_")) %>%
+  select(-snb_16, - snb_17)) 
+
+survey1_coded <- funScore2(survey1_coded, snb_cols, "agreement", ordered = TRUE)
+```
+
+**snb_16 & snb_17**
+
+snb_16 uses its own scoring scheme, snb_17 can use our function.
+
+```{r}
+# snb_16
+snb_16_levels <- c(
+  "Yes, I’ve had an experience like this.",
+  "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
+  "No, I’ve never had an experience like this.")
+
+survey1_coded <- funScore2(survey1_coded, "snb_16", "custom", snb_16_levels)
+
+#snb_17
+survey1_coded <- funScore(survey1_coded, "snb_17", "yesno", reverse = FALSE)
+
+```
+
+### General Belief
+
+They use a variety of different column names which need to be specified.
+
+```{r}
+gb_cols <- colnames(survey1_coded %>%
+  select(starts_with(c("belief", "conf_", "ar_", "apth_", "agn_", "mean_"))))
+
+survey1_coded <- funScore2(survey1_coded, gb_cols, "agreement", ordered = TRUE)
+
+```
+
+## Atheism Membership
+
+```{r}
+survey1_coded <- funScore(survey1_coded, "am_01", "yesno", reverse = FALSE)
+```
+
+## Write coded data
+
+```{r}
+
+write.csv(survey1_coded, "survey_1_coded_FAKE.csv")
+```
+
+# Part 2 - Scoring Survey Variables
+
+Here we score the needed columns into the final variables, and rename the questions to their variable names if needed.
+
+```{r}
+
+survey_1_scored <- survey1_coded %>%
+  mutate(
+    #Individualism & Collectivism Score
+    indiv_collectivism = rowMeans(across(starts_with("ic_"), ~ as.numeric(.))), 
+    
+    #Rebelliousness (Trolling) Score
+    rebel_troll = rowMeans(across(c("reb_01", "reb_02", "reb_03", "reb_04"))),
+    
+    #Rebelliousness (Activism) Score
+    rebel_act = rowMeans(across(c("reb_05", "reb_06", "reb_07", "reb_08", "reb_09"))), 
+    
+    #Rebelliousness (combined) Score
+    rebel_all = rowMeans(across(c("rebel_troll", "rebel_act"))),
+    
+    #Individual Choice Norms Score
+    choice_norms = rowMeans(across(starts_with("icn_"), ~ as.numeric(.))),
+    
+    #Belief in God (categorical)
+    
+    belief_god_cat = issp_01, 
+    
+    #Belief in God (binary)
+    
+    belief_god_bin = case_when(as.numeric(issp_01) == 5 | as.numeric(issp_01) == 6  ~ 1,
+                               TRUE ~ 0),
+    # Belief in God (continuous)
+    
+    belief_god_con = belief_01, 
+    
+    # Agnosticism (continuous)
+    
+    agnosticism_cont = agn_01, 
+    
+    # Agnostic Identity 
+    
+    agnosticism_bin  = case_when(as.numeric(issp_02) == 5 ~ 1,
+                               TRUE ~ 0),
+    # Atheist Membership
+    
+    atheist_mem = am_01, 
+    
+    # Atheist Identity
+    
+    atheist_id = case_when(as.numeric(issp_02) == 4 ~ 1,
+                               TRUE ~ 0), 
+    # Religious Identification
+    
+    relig__id_1 = rid_01, 
+    
+    # Religious Identity, 
+    
+    relig_id_2 = rid_02, 
+    
+    # Religious Attendence
+    
+    relig_attend = rp_01,
+    
+    # Prayer Frequency
+    
+    prayer_freq = rp_02, 
+    
+    # Religious Objects
+    
+    relig_object = rp_03, 
+    
+    # Anti-religiosity
+    
+    anti_relig = ar_01,
+    
+    # Possibility of Knowing (God)
+    
+    god_knowing = belief_02, 
+    
+    # Confidence in Belief
+    
+    belief_confidence = conf_01, 
+    
+    # Apatheism (god)
+    
+    apatheism_god = apth_01,
+    
+    # Apatheism (life purpose)
+    
+    apatheism_purpose = apth_02,
+    
+    # Apatheism (combined)
+    
+    apx1 = as.numeric(apth_01),  #was buggy using as numeric within rowMeans so these are for computing apatheism (combined)
+    apx2 = as.numeric(apth_02),
+    
+    apatheism = rowMeans(across(c("apx1", "apx2"))),
+
+    # Possibility of Truth
+    
+    truth_possibility = mean_01,
+    
+    # Naturalism  - NEEDS TESTING
+    
+    naturalism = case_when(
+      rowSums(across(all_of(snb_cols), ~grepl("Strongly Disagree |Moderately Disagree | Slightly Disagree", .))) > 0 ~ 1, 
+      TRUE ~ 0)
+    
+  )
+
+      
+    
+        
+    
+      
+   
+
+  
+  
+  
+
+
+
+    
+    #Naturalism
+    
+    naturalism
+ #   ) %>% 
+ # select(age,
+ #        sex,
+ #        country,
+ #        indiv_collectivism,
+ #        rebel_troll,
+ #        rebel_act, 
+ #        rebel_all, 
+ #        choice_norms,
+ #        ))
+    
+    
+
+ test <- survey_1_scored %>% select(issp_02, agnosticism_bin)  #example test line to check vars *before* select()
+```
+
+
+
+
+
+

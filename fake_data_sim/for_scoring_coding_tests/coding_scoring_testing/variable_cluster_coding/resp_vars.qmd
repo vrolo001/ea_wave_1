@@ -1,0 +1,302 @@
+---
+title: "Outcome Variable Scoring"
+format: html
+theme: lumen
+
+---
+
+I make frequent use of sections. A fun reminder tip for those reading in RStudio who don't know:
+
+**Alt + O** will fold all sections, and **Shift + Alt + O** will expand all sections.
+
+**Alt + L** will fold the current section, and **Shift + Alt + L** will expand it
+
+##### necessary libraries and functions
+
+```{r}
+
+library("dplyr")
+
+source("scoringFuns.R")
+
+
+df <- read.csv("testing/sim_testingdata/resp_testingdata.csv ") %>% select(-X)
+
+
+```
+
+## ISSP
+
+**issp_01**
+
+```{r, eval=FALSE}
+
+#here we set the response options (which will be the factor levels)
+issp_01_levels  <- c(                                                                        
+  "I don't believe in God",
+  "I don't know whether there is a God, and I don't believe there is any way to find out",
+  "I don't believe in a personal God, but I do believe in a Higher Power of some kind",
+  "I find myself believing in God some of the time, but not at others",
+  "While I have doubts, I feel that I do believe in God.",
+  "I know God really exists and I have no doubt about it.",
+  "Don't know"
+)
+
+
+#here we turn the variable into a factor.
+
+df$issp_01 <- factor(
+  
+  #this matches the element of issp_01 with its position in issp_01_levels vector defined above, so "I don't believe in God" would now be a 1
+  
+  match(df$issp_01, issp_01_levels),
+  
+  #this sets the levels as values 1 through 7
+  levels = 1:7,
+  
+  #and this sets the labels for those levels as per the original labels
+  labels = issp_01_levels)
+
+
+```
+
+**issp_02**
+
+```{r, eval=FALSE}
+
+issp_02_labels <- c(
+  "Spiritual but not religious",
+  "Seeker",
+  "Non-religious",
+  "Atheist",
+  "Agnostic",
+  "Humanist",
+  "Sceptic",
+  "Free thinker",
+  "Rationalist",
+  "Secular",
+  "Christian",
+  "Muslim",
+  "Jewish",
+  "Buddhist",
+  "Hindu",
+  "Daoist",
+  "Shinto",
+  "Confucian",
+  "Other (please specify)"
+  
+)
+
+df$issp_02 <- factor(
+  match(df$issp_02, issp_02_levels),  
+  levels = 1:19,
+  labels = issp_02_levels)
+
+
+```
+
+## Religious Identification
+
+**rid_01**
+
+```{r, eval=FALSE}
+df1 <- funScore(df, "rid_01), "yesno", FALSE)
+
+```
+
+**rid_02**
+
+```{r,eval=FALSE}
+
+rid_02_labels <- c(
+  "Protestant",
+  "Catholic",
+  "Orthodox (e.g. Greek Orthodox, Russian Orthodox)",
+  "Sunni",
+  "Shiite",
+  "Buddhist",
+  "Confucian",
+  "Daoist",
+  "Hindu",
+  "Jewish",
+  "Shinto",
+  "Other (please specify)")
+
+df$rid_02 <- factor(
+  match(df$rid_02, rid_02_labels),  
+  levels = 1:12,
+  labels = rid_02_labels)
+
+
+```
+
+## Religious Practice
+
+**rp_01**
+
+```{r, eval=FALSE}
+rp_01_levels <- c(
+  "More than once a week",
+  "Once a week",
+  "Once a month",
+  "Only on special holy days",
+  "Once a year",
+  "Less often",
+  "Never, practically never"
+)
+  
+
+df$rp_01 <- factor(match(df$rp_01, rp_01_levels),
+                   levels = 1:7,
+                   labels = rp_01_levels)
+
+```
+
+**rp_02**
+
+```{r, eval=FALSE}
+rp_02_levels <- c(
+  "Several times a day",
+  "Once a day",
+  "Several times each week",
+  "Only when attending religious services",
+  "Only on special holy days",
+  "Once a year",
+  "Less often",
+  "Never, practically never"
+)
+  
+
+df$rp_02 <- factor(match(df$rp_02, rp_02_levels),
+                   levels = 1:8,
+                   labels = rp_02_levels)
+
+```
+
+**rp_03**
+
+```{r, eval=FALSE}
+rp_03_levels <- c(
+  "Yes, for religious reasons",
+  "Yes, for non-religious reasons",
+  "No")
+  
+
+df$rp_03 <- factor(match(df$rp_03, rp_03_levels),
+                   levels = 1:3,
+                   labels = rp_03_levels)
+
+```
+
+## Supernatural Belief
+
+Supernatural belief has 15 items that use the same response scale (agreement, so we will use our scoring function for this)
+
+**snb_01 : snb_15**
+
+```{r}
+
+# there are no reverse coded items so we only need to call the function for all columns beginning with snb_
+
+snb_cols <- colnames(df %>%
+  select(starts_with("snb_")) %>%
+  select(-snb_16, - snb_17)) 
+
+print(snb_cols)
+
+agreementrsp <- c("Strongly Disagree", "Moderately Disagree", "Slightly Disagree",
+                 "Neither Agree nor Disagree", "Slightly Agree", "Moderately Agree", "Strongly Agree")
+
+
+
+
+for (i in snb_cols) {
+  df[[i]] <- factor(match(df[[i]], agreementrsp),
+                                     levels = 1:length(agreementrsp),
+                                     labels = agreementrsp)
+                         }
+
+for (i in snb_cols) {
+  print(levels(df[[i]]))
+}
+
+for (i in snb_cols) {
+  print(i)
+  print(as.numeric(df[[i]]))
+}
+
+```
+
+**snb_16 & snb_17**
+
+snb_16 uses its own scoring scheme, snb_17 can use our function.
+
+```{r, eval=FALSE}
+
+# snb_16
+
+snb_16_levels <- c(
+  "Yes, I’ve had an experience like this.",
+  "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
+  "No, I’ve never had an experience like this."
+)
+
+
+df$snb_16 <- factor(match(df$snb_16, snb_16_levels),
+                    levels = 1:3,
+                    labels = snb_16_levels)
+
+
+#snb_17
+
+
+df$snb_17 <- factor(match(df$snb_17, c("Yes", "No")),
+                    levels = 1:2,
+                    labels = c("Yes", "No"))
+
+```
+
+## General Belief
+
+They use a variety of different column names which need to be specified.
+
+```{r, eval=FALSE}
+
+
+gb_cols <- colnames(df %>%
+  select(starts_with(c("belief", "conf_", "ar_", "apth_", "agn_", "mean_"))))
+
+print(gb_cols)
+
+agreementrsp <- c("Strongly Disagree", "Moderately Disagree", "Slightly Disagree",
+                 "Neither Agree nor Disagree", "Slightly Agree", "Moderately Agree", "Strongly Agree")
+
+
+
+
+for (i in gb_cols) {
+  df[[i]] <- factor(match(df[[i]], agreementrsp),
+                                     levels = 1:length(agreementrsp),
+                                     labels = agreementrsp)
+                         }
+
+for (i in gb_cols) {
+  print(levels(df[[i]]))
+}
+
+for (i in gb_cols) {
+  print(i)
+  print(as.numeric(df[[i]]))
+}
+
+```
+
+## Atheism Membership
+
+```{r, eval=FALSE}
+
+df$am_01 <- factor(match(df$am_01, c("Yes", "No")),
+                    levels = 1:2,
+                    labels = c("Yes", "No"))
+
+```

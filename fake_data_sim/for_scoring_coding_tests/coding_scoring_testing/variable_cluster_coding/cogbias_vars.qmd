@@ -1,0 +1,209 @@
+---
+title: "Cognitive Bias Scoring"
+format: html
+theme: lumen
+---
+
+### necessary libraries and functions
+
+```{r}
+
+library("dplyr")
+
+source("scoringFuns.R")
+
+df <- read.csv("testing/sim_testingdata/cogbias_testdat.csv ") %>% select(-X)
+
+
+```
+
+## Anthropomorphism
+
+Anthropomorphism uses our standard scoring scheme for agreement, with no reverse scoring
+
+```{r}
+
+anth_cols <- colnames(df %>%
+  select(starts_with("anth_")))
+
+df <- funScore(df = df,
+               cols = anth_cols,
+               "agreement",
+               FALSE)
+
+```
+
+## Mentalizing 
+
+Mentalizing uses a custom response scale and has some reverse scoring.
+
+
+```{r}
+# response scale
+
+mnt_resps <- c("Definitely Disagree", "Slightly Disagree", "Slightly  Agree", "Definitely  Agree")
+
+
+# columns
+
+mnt_rev <- c("03", "04", "05",  "07", "11", "17")
+
+mnt_cols_rev <- paste0("mnt_", mnt_rev)
+
+mnt_cols <- colnames(df %>%
+  select(starts_with("mnt_")) %>%
+  select(-ends_with((mnt_rev))))
+
+# code
+
+df <- funScore(df = df,
+               cols = mnt_cols,
+               responsescale = "custom",
+               reverse = FALSE,
+               custom = mnt_resps)
+               
+               
+               
+df <- funScore(df = df,
+               cols = mnt_cols_rev,
+               responsescale = "custom",
+               reverse = TRUE,
+               custom = mnt_resps
+)
+```
+## Dualism
+
+Dualism uses our standard agreement response scale and some reverse scoring
+
+```{r}
+
+# columns
+
+dua_rev <- c("04", "09")
+
+dua_cols_rev <- paste0("dua_", dua_rev)
+
+dua_cols <- colnames(df %>%
+  select(starts_with("dua_")) %>%
+  select(-ends_with(dua_rev)))
+
+#code
+
+#normal
+
+df <- funScore(df,
+               dua_cols, 
+               "agreement", 
+               FALSE)
+#reversed
+
+df <- funScore(df,
+               dua_cols_rev, 
+               "agreement", 
+               TRUE)
+```
+
+## Pattern Perception 
+
+custom response scale, no reverse coding
+
+```{r}
+# response scale
+
+pp_resps <- c("Completely Random", "Very Random", "Fairly Random", "Unsure Whether Random Or Non-Random", "Fairly Non-Random",  "Very Non-Random", "Completely Non-Random")
+
+
+# columns
+
+pp_cols <- colnames(df %>%
+  select(starts_with("pp_")))
+
+# code
+
+df <- funScore(df = df,
+               cols = pp_cols,
+               responsescale = "custom",
+               reverse = FALSE,
+               custom = pp_resps
+)
+```
+
+## Promiscuous Teleology
+
+Standard agreement scale, no reverse scoring (CHECK)
+
+```{r}
+
+# columns
+
+tel_cols <- colnames(df %>%
+  select(starts_with("tel_")))
+
+#code
+
+#normal
+
+df <- funScore(df,
+               tel_cols, 
+               "agreement", 
+               FALSE)
+
+```
+
+## Schizotypy
+
+```{r}
+
+# columns
+
+sz_cols <- colnames(df %>%
+  select(starts_with("sz_")))
+
+#code
+
+#normal
+
+df <- funScore(df,
+               sz_cols, 
+               "yesno", 
+               FALSE)
+
+```
+
+
+## Vividness of Mental Imagery
+
+Custom response scale, no reverse coding
+
+```{r}
+
+#response options
+
+vvi_resps <- c("Perfectly clear and as vivid as normal vision", 
+              "Clear and reasonably vivid", 
+              "Moderately clear and vivid", 
+              "Vague and dim", 
+              "No image at all, you only 'know' that you are thinking of an object")
+
+
+# columns
+
+vvi_cols <- colnames(df %>%
+  select(starts_with("vvi_")))
+
+#code
+
+df <- funScore(df = df,
+               cols = vvi_cols,
+               responsescale = "custom",
+               reverse = FALSE,
+               custom = vvi_resps)
+
+```
+
+## Dissociative Absorbtion
+
+Uses a numerical  % scale
+
+
+

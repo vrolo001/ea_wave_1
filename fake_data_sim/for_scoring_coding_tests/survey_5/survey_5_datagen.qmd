@@ -1,0 +1,280 @@
+---
+title: "Survey 5: Data Simulation (coding/scoring)"
+format: html
+editor: visual
+---
+
+This document includes the code to simulate a dataset for Survey 5 of Wave 1 of the Explaining Atheism project.
+
+Survey 5 includes the Cognitive Bias cluster of variables, along with some response variables. We will generate the dataset with our custom easim function.
+
+## Load packages and functions
+
+Here we load dyplr, and our custom function. We use groundhog for reproducibility
+
+```{r}
+
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+
+source("../datasim.R")
+easim <- easim_odd  #to overwrite the easim we loaded with the easim_odd (so we get alternating cols) rather than changing all the code below to easim_odd
+
+
+set.seed(1993)
+```
+
+## Create df and demographics
+
+```{r}
+# data frame with ID, Sex, and Age variables
+df <- data.frame(ID = 1:700,
+                 sex = sample(c("Male", "Female"), 100, replace = TRUE),
+                 age = round(rnorm(100, mean = 30, sd = 10)), 
+                 country = sample(c("Brazil", "Japan", "UK", "Denmark"),
+                                  100,
+                                  replace = TRUE))
+```
+
+## Anthropomorphism
+
+```{r}
+df <- easim_odd(df, 10, "anth_", "agreement", 700)
+
+```
+
+## Mentalizing
+
+```{r}
+
+df <- easim_odd(df, 22, "mnt_", "custom" , 700, c("Definitely Disagree", "Slightly Disagree", "Slightly  Agree", "Definitely  Agree"))
+
+```
+
+## Dualism
+
+```{r}
+
+df <- easim_odd(df, 10, "dua_", "agreement", 700)
+
+```
+
+## Pattern Perception
+
+```{r}
+
+df <- easim_odd(df, 11, "pp_", "custom", 700, c("Completely Random", 
+                                                "Very Random", 
+                                                "Fairly Random", 
+                                                "Unsure Whether Random Or Non-Random", 
+                                                "Fairly Non-Random", 
+                                                "Very Non-Random", 
+                                                "Completely Non-Random"))
+
+```
+
+## Promiscuous Teleology
+
+```{r}
+
+df <- easim_odd(df, 14, "tel_", "agreement", 700)
+
+```
+
+## Schizotypy
+
+```{r}
+
+df <- easim_odd(df, 18, "sz_", "yesno", 700)
+
+```
+
+## Vividness of Mental Imagery
+
+```{r}
+
+df <- easim_odd(df, 32, "vvi_", "custom", 700, c( "Perfectly clear and as vivid as normal vision", 
+                                                  "Clear and reasonably vivid", 
+                                                  "Moderately clear and vivid", 
+                                                  "Vague and dim", 
+                                                  "No image at all, you only 'know' that you are thinking of an object"
+  
+))
+```
+
+## Belief Measure Variables
+
+### ISSP
+
+As there is no reverse coding we can again use normal easim
+
+```{r}
+
+df <- easim(df,
+            1,
+            "issp_",
+            "custom",
+            700,
+            custom = c("I don't believe in God",
+                       "I don't know whether there is a God, and I don't believe there is any way to find out",
+                       "I don't believe in a personal God, but I do believe in a Higher Power of some kind",
+                       "I find myself believing in God some of the time, but not at others",
+                       "While I have doubts, I feel that I do believe in God.",
+                       "I know God really exists and I have no doubt about it.",
+                       "Don't know"
+                       ))
+
+df <- easim(df,
+            2,
+            "issp_",
+            "custom",
+            700,
+            custom = c("Spiritual but not religious",
+                       "Seeker",
+                       "Non-religious",
+                       "Atheist",
+                       "Agnostic",
+                       "Humanist",
+                       "Sceptic",
+                       "Free thinker",
+                       "Rationalist",
+                       "Secular",
+                       "Christian",
+                       "Muslim",
+                       "Jewish",
+                       "Buddhist",
+                       "Hindu",
+                       "Daoist",
+                       "Shinto",
+                       "Confucian",
+                       "Other (please specify)"
+            ), 
+            2)
+
+```
+
+### Religious Identity
+
+```{r}
+
+df <- easim(df, 1, "rid_", "yesno", 700)
+
+df <- easim(df,
+            2,
+            "rid_",
+            "custom",
+            700,
+            c("Protestant",
+              "Catholic",
+              "Orthodox (e.g. Greek Orthodox, Russian Orthodox)",
+              "Sunni",
+              "Shiite",
+              "Buddhist",
+              "Confucian",
+              "Daoist",
+              "Hindu",
+              "Jewish",
+              "Shinto",
+              "Other (please specify)"),
+            2)
+
+
+```
+
+### Religious Practice
+
+```{r}
+
+df <- easim(df,
+            1,
+            "rp_",
+            "custom",
+            700,
+            c("More than once a week",
+              "Once a week",
+              "Once a month",
+              "Only on special holy days",
+              "Once a year",
+              "Less often",
+              "Never, practically never"
+            ),
+            1)
+
+
+df <- easim(df,
+            2,
+            "rp_",
+            "custom",
+            700,
+            c("Several times a day",
+              "Once a day",
+              "Several times each week",
+              "Only when attending religious services",
+              "Only on special holy days",
+              "Once a year",
+              "Less often",
+              "Never, practically never"
+            ),
+            2)
+
+
+df <- easim(df,
+            3,
+            "rp_",
+            "custom",
+            700,
+            c("Yes, for religious reasons",
+              "Yes, for non-religious reasons",
+              "No"),
+            3)
+
+```
+
+### Supernatural Belief
+
+```{r}
+
+df <- easim(df, 15, "snb_", "agreement", 700)
+
+df <- easim(df, 16, "snb_", "custom", 700, c("Yes, I’ve had an experience like this.",
+                                            "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
+                                            "No, I’ve never had an experience like this."),
+            16)
+
+df <- easim(df, 17, "snb_", "yesno", 700, NULL,  17)
+
+
+```
+
+### General Belief
+
+```{r}
+
+df <-  easim(df, 2, "belief_", "agreement", 700)
+
+df <-  easim(df, 1, "conf_", "agreement", 700)
+
+df <-  easim(df, 1, "ar_", "agreement", 700)
+
+df <-  easim(df, 2, "apth_", "agreement", 700)
+
+df <-  easim(df, 1, "mean_", "agreement", 700)
+
+```
+
+### Atheist Membership
+
+```{r}
+
+df <- easim(df, 1, "am_", "yesno", 700)
+```
+
+## Write Datafile
+
+```{r}
+write.csv(df, "survey5_testdat_sc.csv")
+```

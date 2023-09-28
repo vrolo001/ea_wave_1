@@ -1,0 +1,191 @@
+ ---
+title: "Survey 1"
+format: html
+---
+
+```{r, echo=FALSE}
+
+library(simstudy)
+library(tidyverse)
+
+```
+
+
+First we specify the demographic variable definitions:
+
+```{r}
+
+set.seed(888)
+
+def <- defData(varname = "age",
+               dist = "normal",
+               formula = 40,
+               variance = 10)
+
+
+ def <- defData(def,
+               varname = "sex", 
+               dist = "categorical", 
+               formula = "0.05;0.475;0.475")
+
+def <- defData(def,
+               varname = "nation", 
+               dist = "categorical", 
+               formula = "1; 0")
+
+```
+
+## IVs
+
+The IVs here will be from the Morals/Values survey and these will be correlated.
+
+```{r}
+
+#here we create a individualism collectivism variable with a mean of 4.7 and a variance of 1
+
+def <- defData(def,
+               varname = "indiv_collectivism",
+               dist = "normal",
+               formula = 4.7, 
+               variance = 1)
+
+
+# now we compute the rebelliousness variables. We give this a mean, e.g. of 3.4, and crudely make it roughly correlate at around -0.2 (this is done by taking the deviation from the mean for individual collectivism, scaling it by negative -0.4, and adding it to our new mean of 3.4). 
+
+
+def <- defData(def,
+               varname = "rebel_troll",
+               formula = "3.4 + (-0.4 * (indiv_collectivism - mean(indiv_collectivism))) + rnorm(1000, 0, 1)")
+
+
+def <- defData(def,
+               varname = "rebel_act",
+               formula = "3.7 + (-0.4 * (indiv_collectivism - mean(indiv_collectivism))) + rnorm(1000, 0, 1)")
+
+
+def <- defData(def,
+               varname = "rebel_all",
+               formula = "mean(rebel_act + rebel_troll)")
+
+
+
+# We add the individual choice norms variable in the same manner as the rebelliousness variable
+
+
+def <- defData(def,
+               varname = "choice_norms",
+               formula = "4.5 + (-0.2 * (indiv_collectivism - mean(indiv_collectivism))) + rnorm(1000, 0, 1)")
+
+```
+
+Now we can add the dependent variables 
+
+##DVs
+
+### Belief in God
+
+```{r}
+#Belief in God
+
+def <- defData(def,
+               varname = "belief_god_cat", 
+               dist = "categorical", 
+               formula = "1/7; 1/7; 1/7;1/7;1/7;1/7;1/7")
+
+
+def <- defData(def,
+               varname = "belief_god_cont",
+               formula = "5.1", 
+               variance = 1)
+
+```
+
+
+
+### Religiosity 
+
+```{r}
+
+def <- defData(def,
+               varname = "relig_id_1",
+               dist = "binary",
+               formula = "0.55 * belief_god_cont", 
+               link = "logit")
+
+
+def <- defData(def,
+               varname = "relig_attend",
+               formula = "3.4 + (0.55 * belief_god_cont) + rnorm(1000, 0, 1)")
+
+
+```
+
+### Atheism
+
+```{r}
+
+def <- defData(def,
+               varname = "atheist_id",
+               dist = "binary",
+               formula = "0.3 * rebel_act - 0.7 * relig_id_1", 
+               link = "logit")
+
+```
+
+
+Now we generate the dataframe and add, update and format the relevant variables
+
+```{r}
+#generate the dfs (for each country so there are slight country diffs)
+
+df1 <- genData(1000, def)
+
+df2 <- genData(1000, def)
+
+df3 <- genData(1000, def)
+
+
+
+#make factors with labels
+
+#sex
+
+df1 <- genFactor(df1, "sex", labels = c("notSpec", "Male", "Female"), replace = FALSE)
+
+df2 <- genFactor(df2, "sex", labels = c("notSpec", "Male", "Female"), replace = FALSE)
+
+df3 <- genFactor(df3, "sex", labels = c("notSpec", "Male", "Female"), replace = FALSE)
+
+
+#nation
+
+
+df1 <- genFactor(df1, "nation", labels = c("Brazil"), replace = FALSE)
+
+df2 <- genFactor(df2, "nation", labels = c("Japan"), replace = FALSE)
+
+df3 <- genFactor(df3, "nation", labels = c("UK"), replace = FALSE)
+
+
+#combine
+
+
+df <- rbind(df1, df2, df3)
+
+
+```
+
+```{r}
+
+df<- df %>%
+  mutate(across(where(is.numeric), ~round(., digits = 2)))
+
+df <- df %>% select(-sex, -nation)
+
+write.csv(df, "data_s1.csv", row.names = FALSE)
+
+```
+
+
+
+
