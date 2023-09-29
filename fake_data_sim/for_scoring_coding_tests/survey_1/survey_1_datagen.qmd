@@ -236,5 +236,5 @@ df <- easim(df, 1, "am_", "yesno", 700)
 ## Write Datafile
 
 ```{r}
-write.csv(df, "survey1_testdat_sc.csv")
+write.csv(df, "survey1_testdat_sc.csv", row.names = FALSE)
 ```

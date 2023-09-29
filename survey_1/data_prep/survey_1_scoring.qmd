@@ -25,15 +25,12 @@ groundhog.library(libs, "2023-09-23")
 survey1 <- read.csv("survey_1_coded.csv")
 ```
 
-
-
 ## Morals and Values Variables
-
-### Individualism & Collectivism
 
 ```{r}
 
-indiv_collectivism <- 
+survey_1_scored <- survey1 %>%
+  mutate(
+    indiv_collectivism = rowMeans(across(starts_with("x_"), ~ as.numeric(.))))  #Individualism & Collectivism
 
 ```
-
