@@ -1,5 +1,5 @@
 ---
-title: "Survey 1 Coding"
+title: "Survey 1 Coding + Scoring"
 format: html
 editor: visual
 ---
@@ -19,6 +19,9 @@ groundhog.library(libs, "2023-09-23")
 
 source("../../funs/scoringFuns.R")  #this function requires some tidyverse elements
 
+source( "../../funs/beliefcodeFun.R")
+
+
 ```
 
 #### Data
@@ -29,7 +32,7 @@ survey1 <- read.csv("../../survey_1/data/fake_data/for_scoring_coding/survey1_te
 
 # Part 1 - Coding Survey Responses
 
-## Morals & Values Variables
+## Morals & Values Responses
 
 ### Individualism and Collectivism
 
@@ -266,6 +269,8 @@ write.csv(survey1_coded, "survey_1_coded_FAKE.csv", row.names = FALSE)
 Here we score the needed columns into the final variables, and rename the questions to their variable names if needed.
 
 ```{r}
+# Morals and Values Measures
+
 survey_1_scored <- survey1_coded %>%
   mutate(
     #Individualism & Collectivism Score
@@ -282,124 +287,12 @@ survey_1_scored <- survey1_coded %>%
     
     #Individual Choice Norms Score
     choice_norms = rowMeans(across(starts_with("icn_"), ~ as.numeric(.))),
-    
-    #Belief in God (categorical)
-    belief_god_cat = issp_01, 
-    
-    #Belief in God (binary)
-    belief_god_bin = case_when(as.numeric(issp_01) == 5 | as.numeric(issp_01) == 6  ~ 1,
-                               TRUE ~ 0),
-    # Belief in God (continuous)
-    belief_god_con = belief_01, 
-    
-    # Agnosticism (continuous)
-    agnosticism_cont = agn_01, 
-    
-    # Agnostic Identity 
-    agnosticism_bin  = case_when(as.numeric(issp_02) == 5 ~ 1,
-                               TRUE ~ 0),
-    # Atheist Membership
-    atheist_mem = am_01, 
-    
-    # Atheist Identity
-    atheist_id = case_when(as.numeric(issp_02) == 4 ~ 1,
-                               TRUE ~ 0), 
-    # Religious Identification
-    relig__id_1 = rid_01, 
-    
-    # Religious Identity, 
-    relig_id_2 = rid_02, 
-    
-    # Religious Attendence
-    relig_attend = rp_01,
-    
-    # Prayer Frequency
-    prayer_freq = rp_02, 
-    
-    # Religious Objects
-    relig_object = rp_03, 
-    
-    # Anti-religiosity
-    anti_relig = ar_01,
-    
-    # Possibility of Knowing (God)
-    god_knowing = belief_02, 
-    
-    # Confidence in Belief
-    belief_confidence = conf_01, 
-    
-    # Apatheism (god)
-    apatheism_god = apth_01,
-    
-    # Apatheism (life purpose)
-    apatheism_purpose = apth_02,
-    
-    # Apatheism (combined)
-    apx1 = as.numeric(apth_01),  #was buggy using as numeric within rowMeans so these are for computing 
-    apx2 = as.numeric(apth_02),
-    
-    apatheism = rowMeans(across(c("apx1", "apx2"))),
-
-    # Possibility of Truth
-    truth_possibility = mean_01,
-    
-    # Naturalism  - NEEDS TESTING
-    naturalism = case_when(
-      rowSums(across(all_of(snb_cols), ~grepl("Strongly Disagree |Moderately Disagree | Slightly Disagree", .))) > 0 ~ 1, 
-      TRUE ~ 0),
-    
-    # Afterlife Existence
-    afterlife_exist = snb_01,
-    
-    # Afterlife Punishment
-    afterlife_punish= snb_13,
-    
-    # Afterlife Reward
-    afterlife_reward= snb_14,
-    
-    # Reincarnation
-    reincarnation = snb_02,
-    
-    # Astrology
-    astrology = snb_03,
-    
-    # Mystical People
-    msystical_people= snb_04,
-    
-    # Mystical Objects
-    mystical_objects= snb_05,
-    
-    # Good and Evil
-    good_evil = snb_06,
-    
-    # Universal Spirit or Life Force
-    lifeforce = snb_07,
-    
-    # Karma
-    karma = snb_08,
-
-    # Fate
-    fate= snb_09,
-    
-    # Supernatural Beings Existence
-    supernat_beings = snb_10,
-    
-    # Good Supernatural Beings
-    good_beings = snb_11,
-    
-    # Harmful Supernatural Beings
-    harmful_beings= snb_12,
-    
-    # Evil Eye
-    evil_eye= snb_15,
-    
-    # Personal Spiritual Experience
-    spiritual_force = snb_16,
-    
-    #Lucky Object Carrying
-    lucky_objects = snb_17
   )
 
+
+#Belief Measures
+
+survey_1_scored <- funBeliefCode(survey_1_scored)
 
 # test <- survey_1_scored %>% select(issp_02, agnosticism_bin)  #example test line to check vars *before* select()
 ```
@@ -409,7 +302,9 @@ survey_1_scored <- survey1_coded %>%
 ```{r}
 
 survey_1_vars <- survey_1_scored %>%
-  select(1, 2, 3, 4, 68:111, -apx1, apx2)
+  select(1, 2, 3, 4, 68:111, -apx1, -apx2)
+
+colnames(survey_1_vars)
 
 ```
 
@@ -422,4 +317,3 @@ write.csv(survey_1_vars, "survey_1_vars_FAKE.csv", row.names = FALSE)
 
 
 ```
-

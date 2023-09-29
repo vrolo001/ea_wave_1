@@ -1,0 +1,401 @@
+---
+title: "Survey 2 Coding + Scoring"
+format: html
+editor: visual
+---
+
+The first part of this file codes the raw survey responses. The second part scores these into our final variables.
+
+### Load packages, function, and data
+
+```{r}
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+#load functions 
+
+#these function requires some tidyverse elements
+
+source("../../funs/scoringFuns.R")  
+
+source( "../../funs/beliefcodeFun.R")
+
+```
+
+#### Data
+
+```{r}
+
+getwd()
+survey2 <- read.csv("../data/fake_data/for_scoring_coding/survey2_testdat_sc.csv")
+```
+
+# Part 1 - Coding Survey Responses 
+
+## Cognitive Styles Responses
+
+### Tolerance of Ambiguity
+
+```{r}
+#first we specify cols to be reverse coded
+
+at_rev <- c("01", "02", "03",  "04", "05", "06", "09", "11", "12")
+
+at_cols_rev <- paste0("at_", at_rev)
+
+at_cols <- colnames( survey2%>%
+  select(starts_with("at_")) %>%
+  select(-ends_with((at_rev))))
+
+# run the coding script - in the first instance on survey2, thereafter survey2_coded
+
+survey2_coded <- funScore(survey2, at_cols, "agreement", FALSE)
+survey2_coded <- funScore(survey2_coded, at_cols_rev, "agreement", TRUE)
+
+```
+
+## Thinking Style
+
+Thinking style variables are coded as correct, incorrect, or incorrect intuitive
+
+!! I can't anticipate all responses so I will code this properly when we have the data and all of the responses given!!
+
+!!not tested or simulated - this is an example!!
+
+```{r, eval = FALSE}
+
+# remove eval = FALSE  when actually using!
+
+
+# first we would check the different responses given:
+
+#e.g.,
+
+unq_resp_ts_01 <- unique(df$ts_01)
+
+
+# We would then specify what will count as correct,incorrect, incorrect intuitive
+
+#for example
+
+correct_ts01 <- c("Second",
+                   "second",
+                   "secnd",
+                   "2nd", 
+                   "2")
+
+intuitive_ts01 <- c("first",
+                    "1st", 
+                    "1", 
+                    "frst")
+
+# We then specify
+
+tsqs <- colnames( survey2 %>%
+  select(starts_with("ts_"))) 
+
+
+# We could then loop over all ts_ columns, and check that column against its respective correct and intuitive responses.
+  
+for (i in tsqs){
+  
+  survey2_coded <- survey2_coded %>% 
+    mutate(
+      !!paste0("ts_", i) := case_when(
+        . %in% !!paste0("correct_ts", i) ~ "correct",
+        . %in% !!paste0("intuitive_ts", i) ~ "incorrect intuitive",
+        TRUE ~ "incorrect")
+    )
+}
+
+```
+
+## Non-verbal Reasoning
+
+Non-verbal uses a unique scoring scheme
+
+***TO-DO***
+
+## Moralisation of Rationality
+
+Moralisation of Rationality items use the standard scoring scheme so we can use the funScore function
+
+```{r}
+
+# no reverse coding
+
+mor_cols <- colnames(survey2_coded %>%
+  select(starts_with("mor_")))
+
+# code!
+
+survey2_coded <- funScore(survey2_coded, mor_cols, "agreement", FALSE)
+
+
+```
+
+## Importance of Rationality
+
+```{r}
+
+# no reverse coding
+
+imp_cols <- colnames(survey2_coded %>%
+  select(starts_with("imp_")))
+
+# code!
+
+survey2_coded <- funScore(survey2_coded, imp_cols, "agreement", FALSE)
+
+
+```
+
+## Belief Variables
+
+For most of these we want factor responses, so we use funScore2
+
+### ISSP
+
+**issp_01**
+
+```{r}
+#here we set the response options (which will be the factor levels)
+issp_01_levels  <- c(                                                                        
+  "I don't believe in God",
+  "I don't know whether there is a God, and I don't believe there is any way to find out",
+  "I don't believe in a personal God, but I do believe in a Higher Power of some kind",
+  "I find myself believing in God some of the time, but not at others",
+  "While I have doubts, I feel that I do believe in God.",
+  "I know God really exists and I have no doubt about it.",
+  "Don't know")
+
+#here we turn the variable into a factor.
+survey2_coded <- funScore2(survey2_coded, "issp_01", responsescale = "custom", customlev = issp_01_levels)
+
+```
+
+**issp_02**
+
+```{r}
+
+issp_02_levels <- c(
+  "Spiritual but not religious",
+  "Seeker",
+  "Non-religious",
+  "Atheist",
+  "Agnostic",
+  "Humanist",
+  "Sceptic",
+  "Free thinker",
+  "Rationalist",
+  "Secular",
+  "Christian",
+  "Muslim",
+  "Jewish",
+  "Buddhist",
+  "Hindu",
+  "Daoist",
+  "Shinto",
+  "Confucian",
+  "Other (please specify)")
+
+survey2_coded <- funScore2(survey2_coded, "issp_02", responsescale = "custom", customlev = issp_02_levels)
+```
+
+### Religious Identification
+
+**rid_01**
+
+We score this numerically
+
+```{r}
+survey2_coded <- funScore(survey2_coded, "rid_01", "yesno", FALSE)
+```
+
+**rid_02**
+
+```{r}
+rid_02_levels <- c(
+  "Protestant",
+  "Catholic",
+  "Orthodox (e.g. Greek Orthodox, Russian Orthodox)",
+  "Sunni",
+  "Shiite",
+  "Buddhist",
+  "Confucian",
+  "Daoist",
+  "Hindu",
+  "Jewish",
+  "Shinto",
+  "Other (please specify)")
+
+survey2_coded <- funScore2(survey2_coded, "rid_02", responsescale = "custom", customlev = rid_02_levels)
+```
+
+### Religious Practice
+
+These are ordered factors so we add the ordered argument.
+
+**rp_01**
+
+```{r}
+rp_01_levels <- rev(c(    #we reverse this to make the order lowest to highest
+  "More than once a week",
+  "Once a week",
+  "Once a month",
+  "Only on special holy days",
+  "Once a year",
+  "Less often",
+  "Never, practically never"
+))
+
+survey2_coded <- funScore2(survey2_coded, "rp_01", responsescale = "custom", customlev = rp_01_levels, ordered = TRUE)
+
+```
+
+**rp_02**
+
+```{r}
+rp_02_levels <- rev(c(  #we reverse this to make the order lowest to highest
+  "Several times a day",
+  "Once a day",
+  "Several times each week",
+  "Only when attending religious services",
+  "Only on special holy days",
+  "Once a year",
+  "Less often",
+  "Never, practically never"
+))
+
+survey2_coded <- funScore2(survey2_coded, "rp_02", responsescale = "custom", customlev = rp_02_levels, ordered = TRUE)
+
+```
+
+**rp_03**
+
+```{r}
+rp_03_levels <- c(
+  "Yes, for religious reasons",
+  "Yes, for non-religious reasons",
+  "No")
+  
+survey2_coded <- funScore2(survey2_coded, "rp_03", responsescale = "custom", customlev = rp_03_levels)
+```
+
+### Supernatural Belief
+
+Supernatural belief has 15 items that use the same response scale (agreement, so we will use our scoring function for this)
+
+**snb_01 : snb_15**
+
+```{r}
+snb_cols <- colnames(survey2 %>%
+  select(starts_with("snb_")) %>%
+  select(-snb_16, - snb_17)) 
+
+survey2_coded <- funScore2(survey2_coded, snb_cols, "agreement", ordered = TRUE)
+```
+
+**snb_16 & snb_17**
+
+snb_16 uses its own scoring scheme, snb_17 can use our function.
+
+```{r}
+# snb_16
+snb_16_levels <- c(
+  "Yes, I’ve had an experience like this.",
+  "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
+  "No, I’ve never had an experience like this.")
+
+survey2_coded <- funScore2(survey2_coded, "snb_16", "custom", snb_16_levels)
+
+#snb_17
+survey2_coded <- funScore(survey2_coded, "snb_17", "yesno", reverse = FALSE)
+
+```
+
+### General Belief
+
+They use a variety of different column names which need to be specified.
+
+```{r}
+gb_cols <- colnames(survey2_coded %>%
+  select(starts_with(c("belief", "conf_", "ar_", "apth_", "agn_", "mean_"))))
+
+survey2_coded <- funScore2(survey2_coded, gb_cols, "agreement", ordered = TRUE)
+
+```
+
+## Atheism Membership
+
+```{r}
+survey2_coded <- funScore(survey2_coded, "am_01", "yesno", reverse = FALSE)
+```
+
+## Write coded data
+
+```{r}
+
+write.csv(survey2_coded, "survey_2_coded_FAKE.csv", row.names = FALSE)
+```
+
+# Part 2 - Scoring Survey Variables
+
+Here we score the needed columns into the final variables, and rename the questions to their variable names if needed.
+
+```{r}
+
+# Cognitive Styles Variables
+
+
+survey_2_scored <- survey2_coded %>%
+  mutate(
+    #Tolerance of Ambiguity Score
+    ambiguity_tol = rowMeans(across(starts_with("at_"), ~ as.numeric(.))), 
+    
+    # Cognitive Style (correct) -- NEEDS TESTING
+    
+#   crt_correct <- rowSums((across(starts_with("at_") == "correct")))/ length(starts_with("at_")),
+    
+    # Cognitive Style (intuitive)
+
+#   crt_intuitive <- rowSums((across(starts_with("at_") == "correct")))/ length(starts_with("at_")),
+
+    # Non-verbal Reasoning
+
+    # Moralisation of Rationality Score
+    rebel_troll = rowMeans(across(c(starts_with("mor_")))),
+
+    # Importance of Rationality Score
+    rebel_troll = rowMeans(across(c(starts_with("mor_")))))
+
+# Belief measures
+
+survey_2_scored <- funBeliefCode(survey_2_scored)
+
+
+ 
+
+```
+
+## Select Variables For Final Data
+
+```{r}
+
+survey_2_vars <- survey_2_scored %>%
+  select(1, 2, 3, 4, 66:106, -apx1, apx2)
+
+```
+
+## Write Data Files
+
+```{r}
+write.csv(survey_2_scored, "survey_2_scored_FAKE.csv", row.names = FALSE)
+
+write.csv(survey_2_vars, "survey_2_vars_FAKE.csv", row.names = FALSE)
+
+
+```

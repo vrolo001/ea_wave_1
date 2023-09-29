@@ -222,6 +222,9 @@ df <-  easim(df, 2, "apth_", "agreement", 700)
 
 df <-  easim(df, 1, "mean_", "agreement", 700)
 
+df <-  easim(df, 1, "agn_", "agreement", 700)
+
+
 ```
 
 ### Atheist Membership
@@ -234,5 +237,5 @@ df <- easim(df, 1, "am_", "yesno", 700)
 ## Write Datafile
 
 ```{r}
-write.csv(df, "survey2_testdat_sc.csv")
+write.csv(df, "survey2_testdat_sc.csv", row.names = FALSE)
 ```
