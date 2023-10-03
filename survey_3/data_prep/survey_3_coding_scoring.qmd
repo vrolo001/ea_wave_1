@@ -1,0 +1,259 @@
+---
+title: "Survey 3 Coding + Scoring"
+format: html
+editor: visual
+---
+
+The first part of this file codes the raw survey responses. The second part scores these into our final variables.
+
+### Load packages, function, and data
+
+```{r}
+
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+#load functions   
+#these function requires some tidyverse elements 
+
+source("../../funs/scoringFuns.R")
+
+source( "../../funs/beliefcodeFun.R")
+source( "../../funs/beliefscoreFun.R")
+
+
+```
+
+#### Data
+
+```{r}
+getwd() 
+
+survey3 <- read.csv("../data/fake_data/for_scoring_coding/survey3_testdat_sc.csv")
+
+```
+
+# Part 1 - Coding Survey Responses
+
+## Socialisation
+
+### CREDs
+
+```{r}
+
+#first specify extent cols
+
+cred_extent <- c("01", "02", "03", "04", "05", "06", "11", "13", "14", "16", "20", "22", "23", "25", "27", "30")
+cred_extent <- paste0("cred_", cred_extent)
+
+
+cred_yesno <- c("07", "09", "18")
+cred_yesno <- paste0("cred_", cred_yesno)
+
+
+cred_freq <- c("15", "24")
+cred_freq <- paste0("cred_", cred_freq)
+
+
+cred_sincere <- c("10", "12", "19", "21", "28", "31")
+cred_sincere <- paste0("cred_", cred_sincere)
+
+
+
+survey_3_coded <- funScore(survey3, cred_extent, "extent", FALSE)
+
+survey_3_coded <- funScore(survey_3_coded, cred_freq, "frequency", FALSE)
+
+survey_3_coded <- funScore(survey_3_coded, cred_sincere, "custom", FALSE,
+                           custom = c(
+                             "Completely Insincere",
+                             "Very Insincere",
+                             "Insincere",
+                             "Neutral",
+                             "Sincere",
+                             "Very Sincere",
+                             "Completely Sincere"
+                           ))
+
+survey_3_coded <- funScore(survey_3_coded, cred_yesno, "yesno", FALSE)
+
+```
+
+### CRUDs
+
+```{r}
+
+cruds <- colnames(survey_3_coded %>% select(starts_with("crud_")))
+
+survey_3_coded <- funScore(survey_3_coded, cruds, "extent", FALSE)
+
+```
+
+### Non-theistic Socialisation
+
+```{r}
+
+nts <- colnames(survey_3_coded %>% select(starts_with("nts_")))
+
+survey_3_coded <- funScore(survey_3_coded, nts, "extent", FALSE)
+
+```
+
+### Normativity
+
+```{r}
+
+norm <- colnames(survey_3_coded %>% select(starts_with("norm_")))
+
+survey_3_coded <- funScore(survey_3_coded, norm, "extent", FALSE)
+
+```
+
+### Religious Emphasis
+
+```{r}
+
+emph <- colnames(survey_3_coded %>% select(starts_with("re_")))
+
+survey_3_coded <- funScore(survey_3_coded, emph, "extent", FALSE)
+
+```
+
+### Paraental Circumstances
+
+No coding.
+
+## Belief Measures
+
+We have a function for these!
+
+```{r}
+
+survey_3_coded <- funBeliefCode(survey_3_coded)
+
+```
+
+## Write coded data
+
+```{r}
+
+write.csv(survey_3_coded, "survey_3_coded_FAKE.csv", row.names = FALSE)
+```
+
+# Part 2 - Scoring Survey Variables
+
+Here we score the needed columns into the final variables, and rename the questions to their variable names if needed.
+
+```{r}
+
+# Cognitive Styles Variables
+
+survey_3_scored <- survey_3_coded %>%
+  mutate(
+    #CRUD (caregiver)
+    cred_caregiver = rowMeans(across(c("cred_01", "cred_02", "cred_03", "cred_04", "cred_05", "cred_06"))), 
+    
+    #CRED (group leader)
+    cred_grp_leader = rowMeans(across(c("cred_10", "cred_11", "cred_19", "cred_20"))), 
+    
+    #CRED (group member)
+    cred_grp_mbr = rowMeans(across(c("cred_12", "cred_13", "cred_14", "cred_15", "cred_16", "cred_21", "cred_22", "cred_23", "cred_24"))),
+    
+    #CRED (group)
+    
+    cred_grp = rowMeans(across(c("cred_grp_mbr", "cred_grp_leader"))),
+    
+    #CRED Exposure
+    
+    cred = rowMeans(across(c("cred_grp", "cred_caregiver"))),
+    
+    #CRUD (caregiver)
+    
+    crud_caregiver = crud_01, 
+    
+    #CRUD (group member)
+    
+    crud_grp_mbr = crud_02,
+    
+    #CRUD (group leader)
+    
+    crud_grp_ldr = crud_03, 
+    
+    #CRUD (group)
+    
+    crud_grp = rowMeans(across(c("crud_grp_mbr", "crud_grp_ldr"))),
+    
+    #CRUD
+    
+    crud = rowMeans(across(c("crud_grp", "crud_caregiver"))),
+    
+    #Non-theistic Socialisation
+    
+    nontheistic_soc = rowMeans(across(starts_with("nts_"), ~ as.numeric(.))),
+    
+    #Normativity of Religion
+    
+    normativity = rowMeans(across(starts_with("norm_"), ~ as.numeric(.))),
+    
+    #Normativity of Religion (Nation)
+    
+    normativity_nat = rowMeans(across(c("norm_01", "norm_02", "norm_03"))),
+
+    #Normativity of Religion (Ethnicity)
+    
+    normativity_eth = rowMeans(across(c("norm_04", "norm_05", "norm_06"))),    
+    
+    #Normativity of Religion (Peers)
+    
+    normativity_peer = rowMeans(across(c("norm_07", "norm_08", "norm_09"))),    
+    
+    #Normativity of Religion (Group)
+    
+    normativity_grp = rowMeans(across(c("norm_10", "norm_11", "norm_12"))),
+    
+    #Religious Emphasis
+    
+    relig_emph = rowMeans(across(starts_with("re_"), ~ as.numeric(.))),
+    
+    #Parental Circumstances
+    
+    parental_circ = pc_01, 
+    
+    #Parental Absence Reason
+    
+    parent_absence = pc_02)
+
+
+# Belief measures
+
+survey_3_scored <- funBeliefScore(survey_3_scored)
+
+```
+
+## Write scored data
+
+```{r}
+
+write.csv(survey_3_scored, "survey_3_scored_FAKE.csv", row.names = FALSE)
+```
+
+## Select Variables
+
+```{r}
+
+survey_3_vars <- survey_3_scored %>%
+  select(1, 2, 3, 4, 100:157, -apx1, -apx2)
+
+```
+
+## Write variable data
+
+```{r}
+
+write.csv(survey_3_vars, "survey_3_vars_FAKE.csv", row.names = FALSE)
+```
+
+

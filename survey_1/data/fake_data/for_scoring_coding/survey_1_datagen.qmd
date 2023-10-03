@@ -1,12 +1,12 @@
 ---
-title: "Survey 2: Data Simulation (coding/scoring)"
+title: "Survey 1: Data Simulation (coding/scoring)"
 format: html
 editor: visual
 ---
 
-This document includes the code to simulate a dataset for Survey 2 of Wave 1 of the Explaining Atheism project.
+This document includes the code to simulate a dataset for Survey 1 of Wave 1 of the Explaining Atheism project.
 
-Survey 2 includes the Cognitive Styles cluster of variables, along with some response variables. We will generate the dataset with our custom easim function.
+Survey 1 includes the Morals and Values cluster of variables, along with some response variables. We will generate the dataset with our custom easim function.
 
 ## Load packages and functions
 
@@ -21,8 +21,7 @@ libs <- c("dplyr", "stringr")
 groundhog.library(libs, "2023-09-23")
 
 
-source("../datasim.R")
-
+source("../../funs/datasim.R")
 easim <- easim_odd  #to overwrite the easim we loaded with the easim_odd (so we get alternating cols) rather than changing all the code below to easim_odd
 
 
@@ -32,8 +31,8 @@ set.seed(1993)
 ## Create df and demographics
 
 ```{r}
-# data frame with ID, Sex, and Age variables
-df <- data.frame(ID = 1:700,
+# data frame with id, Sex, and Age variables
+df <- data.frame(id = 1:700,
                  sex = sample(c("Male", "Female"), 100, replace = TRUE),
                  age = round(rnorm(100, mean = 30, sd = 10)), 
                  country = sample(c("Brazil", "Japan", "UK"),
@@ -41,34 +40,35 @@ df <- data.frame(ID = 1:700,
                                   replace = TRUE))
 ```
 
-## Tolerance of Ambiguity
+## Morals and Values Variables
+
+As there is no reverse coding we can use normal easim.
+
+### Individualism and Collectivism
 
 ```{r}
-df <- easim_odd(df, 13, "at_", "agreement", 700)
-```
 
-## Thinking Style
-
-## Non-verbal Reasoning
-
-## Moralisation of Rationality
-
-```{r}
-df <- easim_odd(df, 9, "mor_", "agreement", 700)
+df <- easim_odd(df, 15, "ic_", "agreement", 700)
 
 ```
 
-## Importance of Rationality
+### Rebelliousness
 
 ```{r}
+df <- easim_odd(df, 9, "reb_", "extent", 700)
+```
 
-df <- easim_odd(df, 6, "imp_", "agreement", 700)
+### Individual Choice Norms
 
+```{r}
+df <- easim_odd(df, 6, "icn_", "agreement", 700)
 ```
 
 ## Belief Measure Variables
 
 ### ISSP
+
+As there is no reverse coding we can again use normal easim
 
 ```{r}
 
@@ -220,10 +220,9 @@ df <-  easim(df, 1, "ar_", "agreement", 700)
 
 df <-  easim(df, 2, "apth_", "agreement", 700)
 
-df <-  easim(df, 1, "mean_", "agreement", 700)
-
 df <-  easim(df, 1, "agn_", "agreement", 700)
 
+df <-  easim(df, 1, "mean_", "agreement", 700)
 
 ```
 
@@ -237,5 +236,5 @@ df <- easim(df, 1, "am_", "yesno", 700)
 ## Write Datafile
 
 ```{r}
-write.csv(df, "survey2_testdat_sc.csv", row.names = FALSE)
+write.csv(df, "survey1_testdat_sc.csv", row.names = FALSE)
 ```

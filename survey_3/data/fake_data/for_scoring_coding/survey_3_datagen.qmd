@@ -21,8 +21,9 @@ libs <- c("dplyr", "stringr")
 groundhog.library(libs, "2023-09-23")
 
 
-source("../datasim.R")
-easim <- easim_odd  #to overwrite the easim we loaded with the easim_odd (so we get alternating cols) rather than changing all the code below to easim_odd
+source("../../../../funs/datasim.R")
+
+easim <- easim_odd  #to overwrite the easim we loaded with the easim_odd (so we get alternating cols) rather than changing all the code below to easim_odd. We can change this depending on what data type we want. See datasim.R.
 
 
 set.seed(1993)
@@ -46,11 +47,9 @@ The creds scale has a series of different response options, some not standard, s
 
 ### Specify response scales
 
+#### 
+
 ```{r}
-
-
-yesno <- c("Yes", "No")
-
 sincerity <- c("Completely Insincere",
                "Very Insincere",
                "Insincere",
@@ -58,22 +57,6 @@ sincerity <- c("Completely Insincere",
                "Sincere",
                "Very Sincere",
                "Completely Sincere")
-
-extent <- c("1 - To No Extent At All",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7 - To a Great Extent")
-
-frequency <- c("Never",
-               "Very Infrequently",
-               "Infrequently",
-               "Sometimes",
-               "Frequently",
-               "Very Frequently",
-               "Always")
 
 ```
 
@@ -83,29 +66,29 @@ These use the same scale so we can use easim_odd
 
 ```{r}
 
-df <- easim_odd(df, 6, "cred_", "agreement", 700)
+df <- easim_odd(df, 6, "cred_", "extent", 700)
 ```
 
 *cred_07* has yes/no responses
 
 ```{r}
-df$cred_07 <- rep(yesno)
 
+
+df <- easim_odd(df, 7, "cred_", "yesno", 700, NULL,  7)
 ```
 
 *cred_09*
 
 ```{r}
 
-df$cred_09 <- rep(yesno)
-
+df <- easim_odd(df, 9, "cred_", "yesno", 700, NULL, 9)
 ```
 
 *cred_10*
 
 ```{r}
 
-df$cred_10 <- rep(sincerity)
+df <- easim_odd(df, 10, "cred_", "custom", 700 , sincerity, 10)
 
 ```
 
@@ -113,60 +96,79 @@ df$cred_10 <- rep(sincerity)
 
 ```{r}
 
-df$cred_11 <- rep(extent)
-
+df <- easim_odd(df, 11, "cred_", "extent", 700, NULL, 11)
 ```
 
 *cred_12*
 
 ```{r}
 
-df$cred_12 <- rep(sincerity)
-
+df <- easim_odd(df, 12, "cred_", "custom", 700, sincerity, 12)
 ```
 
 *cred_13, cred_14*
 
 ```{r}
-df$cred_13 <- rep(extent)
-
-df$cred_14 <- rep(extent)
+df <- easim_odd(df, 14, "cred_", "extent", 700, NULL, 13)
 
 ```
 
 *cred_15*
 
 ```{r}
-df$cred_15 <- rep(frequency)
+df <- easim_odd(df, 15, "cred_", "frequency", 700, NULL, 15)
 ```
 
+*cred_16*
+
 ```{r}
-df$cred_16 <- rep(extent)
+df <- easim_odd(df, 16, "cred_", "extent", 700, NULL, 16)
+```
+
+cred_17:25
+
+```{r}
+
+df$cred_18 <- df$cred_09
+
+df$cred_19 <- df$cred_10
+
+df$cred_20 <- df$cred_11
+
+df$cred_21 <- df$cred_12
+
+df$cred_22 <- df$cred_13
+
+df$cred_23 <- df$cred_14
+
+df$cred_24 <- df$cred_15
+
+df$cred_25 <- df$cred_16
+
 ```
 
 *cred_27*
 
 ```{r}
-df$cred_27 <- rep(extent)
+df <- easim_odd(df, 27, "cred_", "extent", 700, NULL, 27)
 ```
 
 *cred_28*
 
 ```{r}
-df$cred_28 <- rep(sincerity)
+df <- easim_odd(df, 28, "cred_", "custom", 700, sincerity, 28)
 ```
 
 *cred_30*
 
 ```{r}
-df$cred_30 <- rep(extent)
-
+df <- easim_odd(df, 30, "cred_", "extent", 700, NULL, 30)
 ```
 
 *cred_31*
 
 ```{r}
-df$cred_31 <- rep(sincerity)
+df <- easim_odd(df, 31, "cred_", "custom", 700, sincerity, 31)
 ```
 
 ## CRUDs
@@ -199,6 +201,50 @@ df <- easim_odd(df, 12, "norm_",  "extent", 700)
 df <- easim_odd(df, 9, "re_",  "extent", 700)
 
 ```
+
+## Parental Circumstances
+
+
+```{r}
+
+df <- easim_odd(df,
+                1, 
+                "pc_", 
+                "custom",
+                700, 
+                c("Living with own mother and father",
+                  "Living with two mothers",
+                  "Living with two fathers",
+                  "Living with own father and stepmother",
+                  "Living with own mother and stepfather",
+                  "Living with own father only",
+                  "Living with own mother only",
+                  "Living with other relatives",
+                  "Don't Know",
+                  "Other (please specify)"),
+                1)
+
+df <- easim_odd(df,
+                2, 
+                "pc_", 
+                "custom", 
+                700,
+                c("Mother deceased",
+                  "Father deceased",
+                  "Both parents deceased",
+                  "Parents divorced or separated",
+                  "Father absent (e.g. armed forces, institution)",
+                  "Mother absent (e.g. armed forces, institution)",
+                  "Both parents absent (e.g. armed forces)",
+                  "Other (please specify)", "Don’t know"),
+                2)
+
+
+
+```
+
+
+
 
 ## Belief Measure Variables
 
@@ -358,6 +404,9 @@ df <-  easim(df, 2, "apth_", "agreement", 700)
 
 df <-  easim(df, 1, "mean_", "agreement", 700)
 
+df <-  easim(df, 1, "agn_", "agreement", 700)
+
+
 ```
 
 ### Atheist Membership
@@ -370,5 +419,5 @@ df <- easim(df, 1, "am_", "yesno", 700)
 ## Write Datafile
 
 ```{r}
-write.csv(df, "survey3_testdat_sc.csv")
+write.csv(df, "survey3_testdat_sc.csv", row.names = TRUE)
 ```

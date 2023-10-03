@@ -23,6 +23,9 @@ source("../../funs/scoringFuns.R")
 
 source( "../../funs/beliefcodeFun.R")
 
+source( "../../funs/beliefscoreFun.R")
+
+
 ```
 
 #### Data
@@ -33,7 +36,7 @@ getwd()
 survey2 <- read.csv("../data/fake_data/for_scoring_coding/survey2_testdat_sc.csv")
 ```
 
-# Part 1 - Coding Survey Responses 
+# Part 1 - Coding Survey Responses
 
 ## Cognitive Styles Responses
 
@@ -155,184 +158,12 @@ survey2_coded <- funScore(survey2_coded, imp_cols, "agreement", FALSE)
 
 ## Belief Variables
 
-For most of these we want factor responses, so we use funScore2
-
-### ISSP
-
-**issp_01**
-
-```{r}
-#here we set the response options (which will be the factor levels)
-issp_01_levels  <- c(                                                                        
-  "I don't believe in God",
-  "I don't know whether there is a God, and I don't believe there is any way to find out",
-  "I don't believe in a personal God, but I do believe in a Higher Power of some kind",
-  "I find myself believing in God some of the time, but not at others",
-  "While I have doubts, I feel that I do believe in God.",
-  "I know God really exists and I have no doubt about it.",
-  "Don't know")
-
-#here we turn the variable into a factor.
-survey2_coded <- funScore2(survey2_coded, "issp_01", responsescale = "custom", customlev = issp_01_levels)
-
-```
-
-**issp_02**
+We have a function for these!
 
 ```{r}
 
-issp_02_levels <- c(
-  "Spiritual but not religious",
-  "Seeker",
-  "Non-religious",
-  "Atheist",
-  "Agnostic",
-  "Humanist",
-  "Sceptic",
-  "Free thinker",
-  "Rationalist",
-  "Secular",
-  "Christian",
-  "Muslim",
-  "Jewish",
-  "Buddhist",
-  "Hindu",
-  "Daoist",
-  "Shinto",
-  "Confucian",
-  "Other (please specify)")
+survey2_coded <- funBeliefCode(survey2_coded)
 
-survey2_coded <- funScore2(survey2_coded, "issp_02", responsescale = "custom", customlev = issp_02_levels)
-```
-
-### Religious Identification
-
-**rid_01**
-
-We score this numerically
-
-```{r}
-survey2_coded <- funScore(survey2_coded, "rid_01", "yesno", FALSE)
-```
-
-**rid_02**
-
-```{r}
-rid_02_levels <- c(
-  "Protestant",
-  "Catholic",
-  "Orthodox (e.g. Greek Orthodox, Russian Orthodox)",
-  "Sunni",
-  "Shiite",
-  "Buddhist",
-  "Confucian",
-  "Daoist",
-  "Hindu",
-  "Jewish",
-  "Shinto",
-  "Other (please specify)")
-
-survey2_coded <- funScore2(survey2_coded, "rid_02", responsescale = "custom", customlev = rid_02_levels)
-```
-
-### Religious Practice
-
-These are ordered factors so we add the ordered argument.
-
-**rp_01**
-
-```{r}
-rp_01_levels <- rev(c(    #we reverse this to make the order lowest to highest
-  "More than once a week",
-  "Once a week",
-  "Once a month",
-  "Only on special holy days",
-  "Once a year",
-  "Less often",
-  "Never, practically never"
-))
-
-survey2_coded <- funScore2(survey2_coded, "rp_01", responsescale = "custom", customlev = rp_01_levels, ordered = TRUE)
-
-```
-
-**rp_02**
-
-```{r}
-rp_02_levels <- rev(c(  #we reverse this to make the order lowest to highest
-  "Several times a day",
-  "Once a day",
-  "Several times each week",
-  "Only when attending religious services",
-  "Only on special holy days",
-  "Once a year",
-  "Less often",
-  "Never, practically never"
-))
-
-survey2_coded <- funScore2(survey2_coded, "rp_02", responsescale = "custom", customlev = rp_02_levels, ordered = TRUE)
-
-```
-
-**rp_03**
-
-```{r}
-rp_03_levels <- c(
-  "Yes, for religious reasons",
-  "Yes, for non-religious reasons",
-  "No")
-  
-survey2_coded <- funScore2(survey2_coded, "rp_03", responsescale = "custom", customlev = rp_03_levels)
-```
-
-### Supernatural Belief
-
-Supernatural belief has 15 items that use the same response scale (agreement, so we will use our scoring function for this)
-
-**snb_01 : snb_15**
-
-```{r}
-snb_cols <- colnames(survey2 %>%
-  select(starts_with("snb_")) %>%
-  select(-snb_16, - snb_17)) 
-
-survey2_coded <- funScore2(survey2_coded, snb_cols, "agreement", ordered = TRUE)
-```
-
-**snb_16 & snb_17**
-
-snb_16 uses its own scoring scheme, snb_17 can use our function.
-
-```{r}
-# snb_16
-snb_16_levels <- c(
-  "Yes, I’ve had an experience like this.",
-  "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
-  "No, I’ve never had an experience like this.")
-
-survey2_coded <- funScore2(survey2_coded, "snb_16", "custom", snb_16_levels)
-
-#snb_17
-survey2_coded <- funScore(survey2_coded, "snb_17", "yesno", reverse = FALSE)
-
-```
-
-### General Belief
-
-They use a variety of different column names which need to be specified.
-
-```{r}
-gb_cols <- colnames(survey2_coded %>%
-  select(starts_with(c("belief", "conf_", "ar_", "apth_", "agn_", "mean_"))))
-
-survey2_coded <- funScore2(survey2_coded, gb_cols, "agreement", ordered = TRUE)
-
-```
-
-## Atheism Membership
-
-```{r}
-survey2_coded <- funScore(survey2_coded, "am_01", "yesno", reverse = FALSE)
 ```
 
 ## Write coded data
@@ -367,14 +198,15 @@ survey_2_scored <- survey2_coded %>%
     # Non-verbal Reasoning
 
     # Moralisation of Rationality Score
-    rebel_troll = rowMeans(across(c(starts_with("mor_")))),
+    rationality_moral = rowMeans(across(starts_with("mor_"), ~ as.numeric(.))),
 
     # Importance of Rationality Score
-    rebel_troll = rowMeans(across(c(starts_with("mor_")))))
+    rationality_imp = rowMeans(across(starts_with("imp_"), ~ as.numeric(.))))
+
 
 # Belief measures
 
-survey_2_scored <- funBeliefCode(survey_2_scored)
+survey_2_scored <- funBeliefScore(survey_2_scored)
 
 
  
@@ -386,7 +218,7 @@ survey_2_scored <- funBeliefCode(survey_2_scored)
 ```{r}
 
 survey_2_vars <- survey_2_scored %>%
-  select(1, 2, 3, 4, 66:106, -apx1, apx2)
+  select(1, 2, 3, 4, 66:107, -apx1, -apx2)
 
 ```
 
