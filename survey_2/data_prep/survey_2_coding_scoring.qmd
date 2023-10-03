@@ -124,11 +124,11 @@ Non-verbal uses a unique scoring scheme
 
 ## Moralisation of Rationality
 
-Moralisation of Rationality items use the standard scoring scheme so we can use the funScore function
+Moralisation of Rationality items use the standard scoring scheme so we can use the funScore function. There is no reverse coding.
 
 ```{r}
 
-# no reverse coding
+# get cols
 
 mor_cols <- colnames(survey2_coded %>%
   select(starts_with("mor_")))
@@ -144,7 +144,7 @@ survey2_coded <- funScore(survey2_coded, mor_cols, "agreement", FALSE)
 
 ```{r}
 
-# no reverse coding
+# get cols
 
 imp_cols <- colnames(survey2_coded %>%
   select(starts_with("imp_")))

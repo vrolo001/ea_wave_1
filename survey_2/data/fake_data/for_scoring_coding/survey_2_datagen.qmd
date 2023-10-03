@@ -21,7 +21,7 @@ libs <- c("dplyr", "stringr")
 groundhog.library(libs, "2023-09-23")
 
 
-source("../../funs/datasim.R")
+source("../../../../funs/datasim.R")
 
 easim <- easim_odd  #to overwrite the easim we loaded with the easim_odd (so we get alternating cols) rather than changing all the code below to easim_odd
 

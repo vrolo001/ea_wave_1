@@ -255,5 +255,3 @@ survey_3_vars <- survey_3_scored %>%
 
 write.csv(survey_3_vars, "survey_3_vars_FAKE.csv", row.names = FALSE)
 ```
-
-

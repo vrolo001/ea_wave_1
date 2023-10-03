@@ -1,0 +1,447 @@
+---
+title: "Survey 4 Coding + Scoring"
+format: html
+editor: source
+---
+
+The first part of this file codes the raw survey responses. The second part scores these into our final variables.
+
+We will use a number of functions to score these. See the funs folder for a readme on these.
+
+### Load packages, function, and data
+
+```{r, message=FALSE}
+
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+#load functions   
+#these function requires some tidyverse elements 
+
+source("../../funs/scoringFuns.R")
+
+source( "../../funs/beliefcodeFun.R")
+source( "../../funs/beliefscoreFun.R")
+
+```
+#### Data
+
+```{r}
+
+survey4 <- read.csv("../data/fake_data/for_scoring_coding/survey4_testdat_sc.csv")
+
+```
+# Part 1 - Coding Survey Responses
+
+## Motivational
+
+### Social Desirability
+
+This is scored on our agreement subscale and has some reversed items. As such we use our standard function to code these.
+
+As always the first instance of coding is over the raw dataframe, then following coding is done over this new coding dataframe.
+
+
+```{r}
+
+#get reversed cols
+
+sdrev <- c("01", "03", "04", "05")
+sdcolsrev <- paste0("sd_", sdrev)
+
+#get non reversed cols
+
+sdcols <- colnames(survey4 %>%
+  select(starts_with("sd_")) %>%
+  select(-ends_with((sdrev))))
+
+
+#coding normal items
+
+survey_4_coded <- funScore(survey4, sdcols, "truth", FALSE)
+
+#coding reversed items
+
+survey_4_coded <- funScore(survey_4_coded, sdcolsrev, "truth", TRUE)
+
+
+```
+
+### Existential Security
+
+These are coded on our standard frequency and agreement scales and have no reverse coding. As such we use our standard coding function to code these respectively.
+
+```{r}
+
+#Existential Security
+
+#cols
+
+escols <- colnames(
+  survey_4_coded %>% select(starts_with("es_")))
+
+#coding
+
+survey_4_coded <- funScore(survey_4_coded, escols, "frequency", FALSE)
+
+#Social Security, Wealth Inequality, Social Trust
+
+#cols
+
+sswist <- colnames(
+  survey_4_coded %>% select(starts_with(c("wi_", "st_", "ss_"))))
+
+#coding
+
+survey_4_coded <- funScore(survey_4_coded, sswist, "agreement", FALSE)
+
+```
+
+### Need for Structure
+
+This is coded on our agreement subscale and has some reversed items.
+
+```{r}
+
+#get reversed cols
+
+nfsrev <- c("02", "05", "06", "11")
+nfscolsrev <- paste0("nfs_", nfsrev)
+
+#get non reversed cols
+
+nfscols <- colnames(survey_4_coded %>%
+  select(starts_with("nfs_")) %>%
+  select(-ends_with((nfsrev))))
+
+
+#coding normal items
+survey_4_coded <- funScore(survey_4_coded, nfscols, "agreement", FALSE)
+
+#coding reversed items
+survey_4_coded <- funScore(survey_4_coded, nfscolsrev, "agreement", TRUE)
+
+```
+
+### Death Anxiety
+
+Death Anxiety is coded on our standard agreement scale and has no reversed items.
+
+```{r}
+
+
+dacols <- colnames(survey_4_coded %>% select(starts_with("da_")))
+
+survey_4_coded <- funScore(survey_4_coded, dacols, "agreement", FALSE)
+
+```
+
+## Social Network Size
+
+`this can't really be refined until we have real data so eval is currently = FALSE to stop this running`
+
+Responses here are a list of initials, preferably split by a comma.
+
+We need to check how the data actually looks...
+
+First we check to see if any responses uses any other punctuation other than comma...
+
+```{r, eval=FALSE}
+
+# here we pass the anonymous function across all elements of sns_01, and put the outcomes (TRUE/FALSE) into a new column sns_punct
+
+# str_detect("[[:punct:]&&[^,]]" checks if any punctuation *other* than a comma is used and gives us a column saying whether this is the case or not
+
+df <- df %>%
+  mutate(sns_punct = sapply(sns_01, function(pnct) {
+    any(str_detect(pnct, "[[:punct:]&&[^,]]"))  
+  }))
+
+# We then look to see what the cases look like where this is true
+
+df_inspect <- df %>%
+  filter(
+    sns_punct == TRUE
+  )
+
+# we can create a new column that replaces any punctuation other than a comma with a comma if this is needed
+
+df <- df %>%
+  mutate(sns_replaced = str_replace_all(sns_01, "[[:punct:]&&[^,]]", ","))
+
+
+# if we need to do this with a space as a possible separator too.
+
+df <- df %>%
+  mutate(sns_replaced = str_replace_all(sns_replaced, "[[:punct:]&&[^,\\s]]", ","))
+
+```
+
+Ok, assuming we now have a column where elements are separated by a comma we move on...
+
+We use sns_01 here assuming no changes were needed in the prior chunk, but switch the varname if needed.
+
+```{r, eval=FALSE}
+
+
+#now we create a new column sns_lst, which splits the column by comma..
+
+df <- df %>%
+  mutate(sns_lst = strsplit(sns_replaced, ", "))
+
+# we now check if there are any spaces in any elements of this (if there is we may need to back and add a space with the last part of the last chunk)
+
+df <- df %>%
+  mutate(sns_spaces = sapply(sns_lst, function(spcs) {
+    any(str_detect(spcs, " "))
+  }))
+
+# now we check if any elements of this are longer than 3 (might indicate names)
+
+df <- df %>%
+  mutate(sns_lngth = sapply(sns_lst, function(lngth) {
+    any(nchar(lngth) > 3)
+  }))
+
+```
+
+**Here is where we have to use our big wrinkly brains and figure out if our data is analysable yet...**
+
+if so we use this
+
+```{r, eval=FALSE}
+
+# this creates a new column sns_num which counts the number of elements of sns_lst
+
+df <- df %>%
+  mutate(sns_num = lengths(sns_lst))
+
+```
+
+
+### Need for Meaning
+
+The Need for Meaning questionnaire has agreement responses and some reverse coding.
+
+```{r}
+
+#reverse items
+
+nfmrev <- c("01", "03", "07")
+
+nfmcolsrev <- paste0("nfm_", nfmrev)
+
+nfmcols <- colnames(survey_4_coded %>%
+  select(starts_with("nfm_")) %>%
+  select(-ends_with((nfmrev))))
+
+
+survey_4_coded <- funScore(survey_4_coded, nfmcols, "agreement", FALSE)
+survey_4_coded <- funScore(survey_4_coded, nfmcolsrev, "agreement", TRUE)
+
+```
+
+
+The Meaning in Life questionnaire has truth responses and some reverse coding.
+
+### Meaning in Life:
+
+```{r}
+
+#reverse items
+
+mlqrev <- c("01", "04", "05", "06",  "09")
+
+mlqcolsrev <- paste0("mlq_", mlqrev)
+
+mlqcols <- colnames(survey_4_coded %>%
+  select(starts_with("mlq_")) %>%
+  select(-ends_with((mlqrev))))
+
+
+survey_4_coded <- funScore(survey_4_coded, mlqcols, "truth", FALSE)
+survey_4_coded <- funScore(survey_4_coded, mlqcolsrev, "truth", TRUE)
+
+
+```
+
+## Digust  Sensitivity
+
+Disgust sensitivity has two coding schemes, half are yes/no, the other half a bespoke scheme.
+
+**Yes/No items**
+
+Disgust Sensitivity has a unique scoring scheme for yes/no items, with some reverse scoring
+
+
+```{r}
+#define normal and reverse scoring
+
+ds_norm <- function(x) {
+  x <- recode(x, "True" = 1,
+                 "False" = 2)}
+
+
+ds_rev <- function(x) {
+  x <- recode(x, "True" = 2,
+                 "False" = 1)}
+
+
+#specify cols using yesno
+
+dsyn <- paste0("ds_", sprintf("%02d",1:13))
+
+# the reverse cols
+
+dsynrev <- c("01", "03", "07")
+
+dsyncolsrev <- paste0("ds_", dsynrev)
+
+dsyncols <- colnames(survey_4_coded %>%
+  select(any_of(dsyn)) %>%
+  select(-ends_with(dsynrev)))
+
+
+#coding - normal
+
+survey_4_coded <- survey_4_coded %>%
+  mutate(across(all_of(dsyncols), ds_norm)) %>%
+  mutate(across(all_of(dsyncolsrev), ds_rev))
+
+
+```
+
+**Disgust items**
+
+These also have a unique level structure and scoring scheme
+
+```{r}
+
+#get cols
+
+dsyn2 <- paste0("ds_", sprintf("%02d",14:25))
+
+#make fun
+
+ds2 <- function(x) {
+  x <- recode(x, "Not disgusting" = 0,
+                 "Slightly disgusting" = 0.5,
+                 "Very disgusting" = 1)}
+
+#coding
+
+survey_4_coded <- survey_4_coded %>%
+  mutate(across(all_of(dsyn2), ds2)) 
+
+
+```
+
+## Belief Measures
+
+We have a function for these!
+
+```{r}
+
+survey_4_coded <- funBeliefCode(survey_4_coded)
+
+```
+
+## Write coded data
+
+```{r}
+
+write.csv(survey_4_coded, "survey_4_coded_FAKE.csv", row.names = FALSE)
+```
+
+
+# Part 2 - Scoring Survey Variables
+
+Here we score the needed columns into the final variables, and rename the questions to their variable names if needed.
+
+
+```{r}
+survey_4_scored <- survey_4_coded %>%
+  mutate(
+    
+    #Social Desirability 
+    social_desire = rowMeans(across(starts_with("sd_"), ~ as.numeric(.))),
+    
+    #Existential Security - current
+    ex_sec_cur = rowMeans(across(paste0("es_", sprintf("%02d",1:7)))), 
+    
+    #Existential Security - future
+    ex_sec_future = rowMeans(across(paste0("es_", sprintf("%02d",8:14)))), 
+    
+    #Existential Security - upbringing
+    ex_sec_upb = rowMeans(across(paste0("es_", sprintf("%02d",15:21)))),
+    
+    #Social Security
+    social_sec = rowMeans(across(starts_with("ss_"), ~ as.numeric(.))),
+    
+    #Wealth Inequality
+    wealth_ineq = rowMeans(across(starts_with("wi_"), ~ as.numeric(.))),    
+                           
+    #Social Trust
+    social_trust = rowMeans(across(starts_with("st_"), ~ as.numeric(.))),
+    
+    #Need for Structure
+    need_structure = rowMeans(across(starts_with("nfs_"), ~ as.numeric(.))),
+    
+    #Death Anxiety
+    death_anxiety = rowMeans(across(starts_with("da_"), ~ as.numeric(.))),
+    
+    #Social Network Size
+#    soc_network_size = sns_num,
+
+    #Meaning in Life
+    meaning_life = rowMeans(across(starts_with("mlq_"), ~ as.numeric(.))),
+
+    #Need for Meaning
+    meaning_need = rowMeans(across(starts_with("nfm_"), ~ as.numeric(.))),
+
+    #Disgust Sensitivity
+    disgust_sens = rowMeans(across(starts_with("ds_"), ~ as.numeric(.))),
+
+    #Disgust Sensitivity (core)
+    digust_core = rowMeans(across(paste0("ds_", sprintf("%02d",c(1, 2, 3, 4, 5, 12, 14, 15, 16, 17, 18, 23))))),
+
+    #Disgust Sensitivity (animal)
+    digust_animal = rowMeans(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))),
+
+    #Disgust Sensitivity (contamination)
+    digust_animal = rowMeans(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))))
+
+
+# Belief measures
+
+survey_4_scored <- funBeliefScore(survey_4_scored)
+
+```
+
+## Write scored data
+
+```{r}
+
+write.csv(survey_4_scored, "survey_4_scored_FAKE.csv", row.names = FALSE)
+```
+
+## Select Variables
+
+```{r}
+
+survey_4_vars <- survey_4_scored %>%
+  select(1, 2, 3, 4, 145:197, -apx1, -apx2)
+
+```
+
+## Write variable data
+
+```{r}
+
+write.csv(survey_4_vars, "survey_4_vars_FAKE.csv", row.names = FALSE)
+
+```
+

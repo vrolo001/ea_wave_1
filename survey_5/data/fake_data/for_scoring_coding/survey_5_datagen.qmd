@@ -1,12 +1,12 @@
 ---
-title: "Survey 4: Data Simulation (coding/scoring)"
+title: "Survey 5: Data Simulation (coding/scoring)"
 format: html
 editor: visual
 ---
 
-This document includes the code to simulate a dataset for Survey 4 of Wave 1 of the Explaining Atheism project.
+This document includes the code to simulate a dataset for Survey 5 of Wave 1 of the Explaining Atheism project.
 
-Survey 4 includes the Motivational cluster of variables, along with some response variables. We will generate the dataset with our custom easim function.
+Survey 5 includes the Cognitive Bias cluster of variables, along with some response variables. We will generate the dataset with our custom easim function.
 
 ## Load packages and functions
 
@@ -20,8 +20,9 @@ libs <- c("dplyr", "stringr")
 
 groundhog.library(libs, "2023-09-23")
 
+getwd()
 
-source("../datasim.R")
+source("../../../../funs/datasim.R")
 easim <- easim_odd  #to overwrite the easim we loaded with the easim_odd (so we get alternating cols) rather than changing all the code below to easim_odd
 
 
@@ -35,79 +36,82 @@ set.seed(1993)
 df <- data.frame(ID = 1:700,
                  sex = sample(c("Male", "Female"), 100, replace = TRUE),
                  age = round(rnorm(100, mean = 30, sd = 10)), 
-                 country = sample(c("Brazil", "Japan", "UK"),
+                 country = sample(c("Brazil", "Japan", "UK", "Denmark"),
                                   100,
                                   replace = TRUE))
 ```
 
-## Social Desirability
+## Anthropomorphism
 
 ```{r}
-
-df <- easim_odd(df, 8, "sd_", "truth", 700)
+df <- easim_odd(df, 10, "anth_", "agreement", 700)
 
 ```
 
-## Existential Security
+## Mentalizing
 
 ```{r}
 
-df <- easim_odd(df,  21,  "es_", "frequency", 700)
-
-
-df <- easim_odd(df, 3, "ss_", "agreement", 700)
-
-df <- easim_odd(df, 3, "wi_", "agreement", 700)
-
-df <- easim_odd(df, 3, "st_", "agreement", 700)
-
+df <- easim_odd(df, 22, "mnt_", "custom" , 700, c("Definitely Disagree", "Slightly Disagree", "Slightly  Agree", "Definitely  Agree"))
 
 ```
 
-## Need for Structure
+## Dualism
 
 ```{r}
 
-df <- easim_odd(df, 12, "nfs_", "agreement", 700)
+df <- easim_odd(df, 10, "dua_", "agreement", 700)
 
 ```
 
-## Death Anxiety
-
+## Pattern Perception
 
 ```{r}
 
-df <- easim_odd(df, 12, "da_", "agreement", 700)
+df <- easim_odd(df, 11, "pp_", "custom", 700, c("Completely Random", 
+                                                "Very Random", 
+                                                "Fairly Random", 
+                                                "Unsure Whether Random Or Non-Random", 
+                                                "Fairly Non-Random", 
+                                                "Very Non-Random", 
+                                                "Completely Non-Random"))
 
 ```
 
-## Social Network Size
+## Promiscuous Teleology
 
 ```{r}
+
+df <- easim_odd(df, 14, "tel_", "agreement", 700)
 
 ```
 
-## Need for Meaning
+## Schizotypy
 
 ```{r}
 
-df <- easim_odd(df, 10, "mlq_", "truth", 700)
-
-df <- easim_odd(df, 10, "nfm_", "agreement", 700)
+df <- easim_odd(df, 18, "sz_", "yesno", 700)
 
 ```
 
-## Disgust Sensitivity
+## Vividness of Mental Imagery
 
 ```{r}
 
-df <- easim_odd(df, 13, "ds_", "truefalse", 700)
+df <- easim_odd(df, 32, "vvi_", "custom", 700, c( "Perfectly clear and as vivid as normal vision", 
+                                                  "Clear and reasonably vivid", 
+                                                  "Moderately clear and vivid", 
+                                                  "Vague and dim", 
+                                                  "No image at all, you only 'know' that you are thinking of an object"
+  
+))
+```
 
-df <- easim_odd(df, 25, "ds_", "custom", 700,
-              custom =c("Not Disgusting",
-                        "Slightly Disgusting",
-                        "Very Disgusting"),
-              qns= 14)
+## Dissociative Absorbtion
+
+```{r}
+
+df <- easim_odd(df, 8, "dab_", "custom", 700, c(0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100))
 
 ```
 
@@ -269,6 +273,8 @@ df <-  easim(df, 2, "apth_", "agreement", 700)
 
 df <-  easim(df, 1, "mean_", "agreement", 700)
 
+df <-  easim(df, 1, "agn_", "agreement", 700)
+
 ```
 
 ### Atheist Membership
@@ -281,5 +287,5 @@ df <- easim(df, 1, "am_", "yesno", 700)
 ## Write Datafile
 
 ```{r}
-write.csv(df, "survey4_testdat_sc.csv")
+write.csv(df, "survey5_testdat_sc.csv", row.names = FALSE)
 ```

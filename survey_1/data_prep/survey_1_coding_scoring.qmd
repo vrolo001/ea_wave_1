@@ -36,13 +36,11 @@ survey1 <- read.csv("../../survey_1/data/fake_data/for_scoring_coding/survey1_te
 
 ### Individualism and Collectivism
 
-As this uses our standard response scale for agreement we can use our standard scoring function
+As this uses our standard response scale for agreement we can use our standard coding function. It also has no reverse coding.
 
-For the first variable we run the function on survey1, from then on we run it on survey1_scored.
+For the first variable we run the function on survey1, from then on we run it on survey1_coded.
 
 ```{r}
-
-#no items are reversed scored so we can just use the same function across all the ic items
 
 #first we select the relevant columns
 
@@ -74,7 +72,6 @@ icn_cols <- colnames(survey1_coded %>%
 
 survey1_coded <- funScore(survey1_coded, icn_cols, "agreement", FALSE)
 ```
-
 
 ## Belief Variables
 

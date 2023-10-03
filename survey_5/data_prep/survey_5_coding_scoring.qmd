@@ -1,0 +1,323 @@
+---
+title: "Survey 5 Coding + Scoring"
+format: html
+editor: visual
+---
+
+The first part of this file codes the raw survey responses. The second part scores these into our final variables.
+
+### Load packages, function, and data
+
+```{r, message=FALSE}
+
+library(groundhog)
+
+libs <- c("dplyr", "stringr")
+
+groundhog.library(libs, "2023-09-23")
+
+#load functions
+#these functions require some tidyverse elements
+
+source("../../funs/scoringFuns.R")  #these functions require some tidyverse elements
+source( "../../funs/beliefcodeFun.R")
+source( "../../funs/beliefscoreFun.R")
+
+```
+
+The functions loaded above do multiple things.
+
+`funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
+
+`funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
+
+`funScore` and `funScore2` are functions to **code** (excuse the incorrect naming!!!) our survey responses, ready for scoring. funScore will score numerically, and funScore2 will create factors.
+
+#### Data
+
+```{r}
+
+survey5 <- read.csv("../../survey_5/data/fake_data/for_scoring_coding/survey5_testdat_sc.csv")
+
+```
+
+# Part 1 - Coding Survey Responses
+
+## Cognitive Bias Measures
+
+### Anthropomorphism
+
+Anthropomorphism uses our standard coding scheme for agreement, with no reverse coding
+
+```{r}
+
+# get cols
+
+anthcols <- colnames(survey5 %>% select(starts_with("anth_")))
+
+# code
+
+survey_5_coded <- funScore(survey5, anthcols, "agreement", FALSE)
+
+```
+
+### Mentalizing
+
+Mentalizing uses a custom response scale and has some reverse coding
+
+```{r}
+# response scale
+
+mntresps <-
+  c("Definitely Disagree",
+    "Slightly Disagree",
+    "Slightly  Agree",
+    "Definitely  Agree")
+
+
+# columns
+
+mntrev <- c("03", "04", "05",  "07", "11", "17")
+
+mntcolsrev <- paste0("mnt_", mntrev)
+
+mntcols <- colnames(survey_5_coded %>%
+                      select(starts_with("mnt_")) %>%
+                      select(-ends_with((mntrev))))
+
+# code
+
+survey_5_coded <- funScore(df = survey_5_coded,
+                           cols = mntcols,
+                           responsescale = "custom",
+                           reverse = FALSE,
+                           custom = mntresps
+)
+
+
+
+survey_5_coded <- funScore(df = survey_5_coded,
+                           cols = mntcolsrev,
+                           responsescale = "custom",
+                           reverse = TRUE,
+                           custom = mntresps
+)
+```
+
+### Dualism
+
+Dualism uses our standard agreement response scale and some reverse coding
+
+```{r}
+
+
+# get cols
+
+duarev <- c("04", "09")
+
+duacolsrev <- paste0("dua_", duarev)
+
+duacols <- colnames(survey_5_coded %>%
+                      select(starts_with("dua_")) %>%
+                      select(-ends_with(duarev)))
+
+#code
+
+#normal
+
+survey_5_coded <- funScore(survey_5_coded,
+                           duacols,
+                           "agreement",
+                           FALSE)
+#reversed
+
+survey_5_coded <- funScore(survey_5_coded,
+                           duacolsrev,
+                           "agreement",
+                           TRUE)
+```
+
+### Pattern Perception
+
+custom response scale, no reverse coding
+
+```{r}
+# response scale
+
+ppresps <- c("Completely Random", "Very Random", "Fairly Random", "Unsure Whether Random Or Non-Random", "Fairly Non-Random",  "Very Non-Random", "Completely Non-Random")
+
+
+# get cols
+
+ppcols <- colnames(survey_5_coded %>%
+  select(starts_with("pp_")))
+
+# code
+
+survey_5_coded <- funScore(df = survey_5_coded,
+                           cols = ppcols,
+                           responsescale = "custom",
+                           reverse = FALSE,
+                           custom = ppresps
+)
+```
+
+### Promiscuous Teleology
+
+Standard agreement scale, no reverse coding **(CHECK)**
+
+```{r}
+
+# columns
+
+telcols <- colnames(survey_5_coded %>%
+  select(starts_with("tel_")))
+
+#code
+
+#normal
+
+survey_5_coded <- funScore(survey_5_coded,
+               telcols, 
+               "agreement", 
+               FALSE)
+
+```
+
+## Schizotypy
+
+Standard agreement scale, no reverse coding
+
+```{r}
+
+# get cols
+
+szcols <- colnames(survey_5_coded %>%
+  select(starts_with("sz_")))
+
+#code
+
+#normal
+
+survey_5_coded <- funScore(survey_5_coded,
+                             szcols, 
+                             "yesno", 
+                             FALSE)
+              
+```
+
+### Vividness of Mental Imagery
+
+Custom response scale, no reverse coding
+
+```{r}
+
+#response options
+
+vviresps <- c("Perfectly clear and as vivid as normal vision", 
+              "Clear and reasonably vivid", 
+              "Moderately clear and vivid", 
+              "Vague and dim", 
+              "No image at all, you only 'know' that you are thinking of an object")
+
+
+# get cols
+
+vvicols <- colnames(survey_5_coded %>%
+  select(starts_with("vvi_")))
+
+#code
+
+survey_5_coded <- funScore(df = survey_5_coded,
+                           cols = vvicols,
+                           responsescale = "custom",
+                           reverse = FALSE,
+                           custom = vviresps)
+
+```
+
+## Belief Variables
+
+We have a function for these!
+
+```{r}
+
+survey_5_coded <- funBeliefCode(survey_5_coded)
+
+```
+
+## Write coded data
+
+```{r}
+
+write.csv(survey_5_coded, "survey_5_coded_FAKE.csv", row.names = FALSE)
+```
+
+# Part 2 - Scoring Survey Variables
+
+Here we score the needed columns into the final variables, and rename the questions to their variable names if needed.
+
+```{r}
+# Morals and Values Measures
+
+survey_5_scored <- survey_5_coded %>%
+  mutate(
+    #Anthropomorphism
+    anthropomorphism = rowMeans(across(starts_with("anth_"), ~ as.numeric(.))), 
+
+    #Mentalizing
+    mentalizing = rowMeans(across(starts_with("mnt_"), ~ as.numeric(.))),
+    
+    #Dualism
+    dualism = rowMeans(across(starts_with("dua_"), ~ as.numeric(.))),  
+    
+    #Pattern Perception
+    pattern_percep = rowMeans(across(paste0("pp_", sprintf("%02d",1:10)))), 
+    
+    #Pattern Perception (long)
+    pattern_percep_l = pp_11,
+    
+    #Schizotypy
+    schizotypy = rowMeans(across(starts_with("sz_"), ~ as.numeric(.))), 
+    
+    #Schizotypy (reference)
+    schizotypy_ref = rowMeans(across(paste0("sz_", sprintf("%02d",1:9)))), 
+    
+    #Schizotypy (perceptual)
+    schizotypy_percep = rowMeans(across(paste0("sz_", sprintf("%02d",10:18)))),
+    
+    #Vividness of Mental Imagery
+    vividness_imagery = rowMeans(across(starts_with("vvi_"), ~ as.numeric(.))), 
+    
+    #Dissociative Absorbtion
+    absorbtion = rowMeans(across(starts_with("dab_"), ~ as.numeric(.)))
+  )
+
+# Belief measures
+
+survey_5_scored <- funBeliefScore(survey_5_scored)
+    
+```
+
+## Write scored data
+
+```{r}
+
+write.csv(survey_5_scored, "survey_5_scored_FAKE.csv", row.names = FALSE)
+```
+
+## Select Variables
+
+```{r}
+
+survey_5_vars <- survey_5_scored %>%
+  select(1, 2, 3, 4, 163:211, -apx1, -apx2)
+
+```
+
+## Write final variable data
+
+```{r}
+
+write.csv(survey_5_vars, "survey_5_vars_FAKE.csv", row.names = FALSE)
+```
