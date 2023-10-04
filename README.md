@@ -4,6 +4,7 @@
 
 This will be the final broad structure of the repo. Not all elements are populated yet, and more specific information can be found in the readme at each level.
 
+```
 ├── funs
 │   
 ├── survey_1
@@ -19,5 +20,5 @@ This will be the final broad structure of the repo. Not all elements are populat
 ...
 ├── survey_3
 ...
-
+```
 
