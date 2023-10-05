@@ -128,7 +128,7 @@ survey_3_coded <- funCode(survey_3_coded, emph, "extent", FALSE)
 
 ```
 
-### Paraental Circumstances
+### Parental Circumstances
 
 No coding.
 

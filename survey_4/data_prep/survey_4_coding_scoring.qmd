@@ -411,16 +411,16 @@ survey_4_scored <- survey_4_coded %>%
     meaning_need = rowMeans(across(starts_with("nfm_"), ~ as.numeric(.))),
 
     #Disgust Sensitivity
-    disgust_sens = rowMeans(across(starts_with("ds_"), ~ as.numeric(.))),
+    disgust_sens = rowSums(across(starts_with("ds_"), ~ as.numeric(.))),
 
     #Disgust Sensitivity (core)
-    digust_core = rowMeans(across(paste0("ds_", sprintf("%02d",c(1, 2, 3, 4, 5, 12, 14, 15, 16, 17, 18, 23))))),
+    digust_core = rowSums(across(paste0("ds_", sprintf("%02d",c(1, 2, 3, 4, 5, 12, 14, 15, 16, 17, 18, 23))))),
 
     #Disgust Sensitivity (animal)
-    digust_animal = rowMeans(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))),
+    digust_animal = rowSums(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))),
 
     #Disgust Sensitivity (contamination)
-    digust_animal = rowMeans(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))))
+    digust_animal = rowSums(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))))
 
 
 # Belief measures
