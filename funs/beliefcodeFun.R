@@ -1,6 +1,6 @@
 
 #this path needs to be same as that used in script this fun is called to
-source("../../funs/scoringFuns.R")  
+source("../../funs/codingFuns.R")  
 
 
 ######### This funsction uses funScore and funScore2, the former codes as numeric, the latter as factors.
@@ -42,15 +42,15 @@ funBeliefCode <- function(dat) {
     "Other (please specify)")
   
 #here we turn the variable into a factor.
-  dat <- funScore2(dat, "issp_01", responsescale = "custom", customlev = issp_01_levels)  
+  dat <- funCode2(dat, "issp_01", responsescale = "custom", customlev = issp_01_levels)  
   
-  dat <- funScore2(dat, "issp_02", responsescale = "custom", customlev = issp_02_levels)  
+  dat <- funCode2(dat, "issp_02", responsescale = "custom", customlev = issp_02_levels)  
   
 # Religious Identification
 
-# scored numerically with funScore
+# scored numerically with funCode
  
-  dat <- funScore(dat, "rid_01", "yesno", FALSE)
+  dat <- funCode(dat, "rid_01", "yesno", FALSE)
 
   rid_02_levels <- c(
     "Protestant",
@@ -66,7 +66,7 @@ funBeliefCode <- function(dat) {
     "Shinto",
     "Other (please specify)")
   
-  dat <- funScore2(dat, "rid_02", responsescale = "custom", customlev = rid_02_levels)
+  dat <- funCode2(dat, "rid_02", responsescale = "custom", customlev = rid_02_levels)
   
   
 # Religious Practice
@@ -97,11 +97,11 @@ funBeliefCode <- function(dat) {
     "Yes, for non-religious reasons",
     "No")
   
-  dat <- funScore2(dat, "rp_01", responsescale = "custom", customlev = rp_01_levels, ordered = TRUE)
+  dat <- funCode2(dat, "rp_01", responsescale = "custom", customlev = rp_01_levels, ordered = TRUE)
     
-  dat <- funScore2(dat, "rp_02", responsescale = "custom", customlev = rp_02_levels, ordered = TRUE) 
+  dat <- funCode2(dat, "rp_02", responsescale = "custom", customlev = rp_02_levels, ordered = TRUE) 
   
-  dat <- funScore2(dat, "rp_03", responsescale = "custom", customlev = rp_03_levels)
+  dat <- funCode2(dat, "rp_03", responsescale = "custom", customlev = rp_03_levels)
   
   
 # Supernatural Belief
@@ -114,11 +114,11 @@ funBeliefCode <- function(dat) {
     "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
     "No, I’ve never had an experience like this.")
     
-  dat <- funScore2(dat, snb_cols, "agreement", ordered = TRUE)
+  dat <- funCode2(dat, snb_cols, "agreement", ordered = TRUE)
   
-  dat <- funScore2(dat, "snb_16", "custom", snb_16_levels)
+  dat <- funCode2(dat, "snb_16", "custom", snb_16_levels)
   
-  dat <- funScore(dat, "snb_17", "yesno", reverse = FALSE)
+  dat <- funCode(dat, "snb_17", "yesno", reverse = FALSE)
   
   
 # General Belief
@@ -126,12 +126,12 @@ funBeliefCode <- function(dat) {
   gb_cols <- colnames(dat %>%
                         select(starts_with(c("belief", "conf_", "ar_", "apth_", "agn_", "mean_"))))
   
-  dat <- funScore2(dat, gb_cols, "agreement", ordered = TRUE)
+  dat <- funCode2(dat, gb_cols, "agreement", ordered = TRUE)
   
   
 # Atheist Membership
   
-  dat <- funScore(dat, "am_01", "yesno", reverse = FALSE)
+  dat <- funCode(dat, "am_01", "yesno", reverse = FALSE)
   
   
 return(dat)

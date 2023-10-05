@@ -8,7 +8,7 @@ The first part of this file codes the raw survey responses. The second part scor
 
 ### Load packages, function, and data
 
-```{r}
+```{r, message=FALSE}
 library(groundhog)
 
 libs <- c("dplyr", "stringr")
@@ -19,7 +19,7 @@ groundhog.library(libs, "2023-09-23")
 
 #these function requires some tidyverse elements
 
-source("../../funs/scoringFuns.R")  
+source("../../funs/codingFuns.R")  
 
 source( "../../funs/beliefcodeFun.R")
 
@@ -28,11 +28,18 @@ source( "../../funs/beliefscoreFun.R")
 
 ```
 
+The functions loaded above do multiple things.
+
+`funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
+
+`funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
+
+`funCode` and `funCode2` are functions to **code** our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
+
 #### Data
 
 ```{r}
 
-getwd()
 survey2 <- read.csv("../data/fake_data/for_scoring_coding/survey2_testdat_sc.csv")
 ```
 
@@ -55,8 +62,8 @@ at_cols <- colnames( survey2%>%
 
 # run the coding script - in the first instance on survey2, thereafter survey2_coded
 
-survey2_coded <- funScore(survey2, at_cols, "agreement", FALSE)
-survey2_coded <- funScore(survey2_coded, at_cols_rev, "agreement", TRUE)
+survey2_coded <- funCode(survey2, at_cols, "agreement", FALSE)
+survey2_coded <- funCode(survey2_coded, at_cols_rev, "agreement", TRUE)
 
 ```
 
@@ -124,7 +131,7 @@ Non-verbal uses a unique scoring scheme
 
 ## Moralisation of Rationality
 
-Moralisation of Rationality items use the standard scoring scheme so we can use the funScore function. There is no reverse coding.
+Moralisation of Rationality items use the standard scoring scheme so we can use the funCode function. There is no reverse coding.
 
 ```{r}
 
@@ -135,7 +142,7 @@ mor_cols <- colnames(survey2_coded %>%
 
 # code!
 
-survey2_coded <- funScore(survey2_coded, mor_cols, "agreement", FALSE)
+survey2_coded <- funCode(survey2_coded, mor_cols, "agreement", FALSE)
 
 
 ```
@@ -151,7 +158,7 @@ imp_cols <- colnames(survey2_coded %>%
 
 # code!
 
-survey2_coded <- funScore(survey2_coded, imp_cols, "agreement", FALSE)
+survey2_coded <- funCode(survey2_coded, imp_cols, "agreement", FALSE)
 
 
 ```

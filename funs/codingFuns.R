@@ -1,12 +1,12 @@
 
 # Here we have two different scoring functions
 
-# funScore - this scores directly, replacing the response wording with numeric scores.
+# funCode - this scores directly, replacing the response wording with numeric scores.
 
-# funScore2 - this codes responses into factors.
+# funCode2 - this codes responses into factors.
 
 
-funScore  <- function(df, cols, responsescale, reverse, custom = NULL) {
+funCode  <- function(df, cols, responsescale, reverse, custom = NULL) {
   # arguments:
   # df (our existing dataframe)
   # columns - a column or series of columns
@@ -153,7 +153,7 @@ labels <- response_scales[[responsescale]]
 
 
 
-funScore2 <- function(df, cols, responsescale, customlev = NULL, ordered = FALSE) {
+funCode2 <- function(df, cols, responsescale, customlev = NULL, ordered = FALSE) {
   
   # arguments:
   # df (our existing dataframe)
@@ -180,7 +180,7 @@ funScore2 <- function(df, cols, responsescale, customlev = NULL, ordered = FALSE
   
 #create factor info for response scales
   
-#these are created such that the levels interpretation makes sense (e.g. higher levels aremore agreement, truth, frequency, extent etc.)
+#these are created such that the levels interpretation makes sense (e.g. higher levels are more agreement, truth, frequency, extent etc.)
   
   
 response_scales <-   list("agreement" = list(levels = c("Strongly Disagree",

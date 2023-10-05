@@ -21,16 +21,24 @@ groundhog.library(libs, "2023-09-23")
 #load functions   
 #these function requires some tidyverse elements 
 
-source("../../funs/scoringFuns.R")
+source("../../funs/codingFuns.R")
 
 source( "../../funs/beliefcodeFun.R")
 source( "../../funs/beliefscoreFun.R")
 
 ```
+
+The functions loaded above do multiple things.
+
+funBeliefCode is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
+
+funBeliefCode does a similar thing but scores variables and defines them according to their final definitions for analysis.
+
+funCode and funCode2 are functions to code our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
+
 #### Data
 
 ```{r}
-
 survey4 <- read.csv("../data/fake_data/for_scoring_coding/survey4_testdat_sc.csv")
 
 ```
@@ -61,11 +69,11 @@ sdcols <- colnames(survey4 %>%
 
 #coding normal items
 
-survey_4_coded <- funScore(survey4, sdcols, "truth", FALSE)
+survey_4_coded <- funCode(survey4, sdcols, "truth", FALSE)
 
 #coding reversed items
 
-survey_4_coded <- funScore(survey_4_coded, sdcolsrev, "truth", TRUE)
+survey_4_coded <- funCode(survey_4_coded, sdcolsrev, "truth", TRUE)
 
 
 ```
@@ -85,7 +93,7 @@ escols <- colnames(
 
 #coding
 
-survey_4_coded <- funScore(survey_4_coded, escols, "frequency", FALSE)
+survey_4_coded <- funCode(survey_4_coded, escols, "frequency", FALSE)
 
 #Social Security, Wealth Inequality, Social Trust
 
@@ -96,7 +104,7 @@ sswist <- colnames(
 
 #coding
 
-survey_4_coded <- funScore(survey_4_coded, sswist, "agreement", FALSE)
+survey_4_coded <- funCode(survey_4_coded, sswist, "agreement", FALSE)
 
 ```
 
@@ -119,10 +127,10 @@ nfscols <- colnames(survey_4_coded %>%
 
 
 #coding normal items
-survey_4_coded <- funScore(survey_4_coded, nfscols, "agreement", FALSE)
+survey_4_coded <- funCode(survey_4_coded, nfscols, "agreement", FALSE)
 
 #coding reversed items
-survey_4_coded <- funScore(survey_4_coded, nfscolsrev, "agreement", TRUE)
+survey_4_coded <- funCode(survey_4_coded, nfscolsrev, "agreement", TRUE)
 
 ```
 
@@ -135,7 +143,7 @@ Death Anxiety is coded on our standard agreement scale and has no reversed items
 
 dacols <- colnames(survey_4_coded %>% select(starts_with("da_")))
 
-survey_4_coded <- funScore(survey_4_coded, dacols, "agreement", FALSE)
+survey_4_coded <- funCode(survey_4_coded, dacols, "agreement", FALSE)
 
 ```
 
@@ -239,8 +247,8 @@ nfmcols <- colnames(survey_4_coded %>%
   select(-ends_with((nfmrev))))
 
 
-survey_4_coded <- funScore(survey_4_coded, nfmcols, "agreement", FALSE)
-survey_4_coded <- funScore(survey_4_coded, nfmcolsrev, "agreement", TRUE)
+survey_4_coded <- funCode(survey_4_coded, nfmcols, "agreement", FALSE)
+survey_4_coded <- funCode(survey_4_coded, nfmcolsrev, "agreement", TRUE)
 
 ```
 
@@ -262,8 +270,8 @@ mlqcols <- colnames(survey_4_coded %>%
   select(-ends_with((mlqrev))))
 
 
-survey_4_coded <- funScore(survey_4_coded, mlqcols, "truth", FALSE)
-survey_4_coded <- funScore(survey_4_coded, mlqcolsrev, "truth", TRUE)
+survey_4_coded <- funCode(survey_4_coded, mlqcols, "truth", FALSE)
+survey_4_coded <- funCode(survey_4_coded, mlqcolsrev, "truth", TRUE)
 
 
 ```

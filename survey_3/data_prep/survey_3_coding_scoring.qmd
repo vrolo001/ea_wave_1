@@ -8,7 +8,7 @@ The first part of this file codes the raw survey responses. The second part scor
 
 ### Load packages, function, and data
 
-```{r}
+```{r, message=FALSE}
 
 library(groundhog)
 
@@ -19,7 +19,7 @@ groundhog.library(libs, "2023-09-23")
 #load functions   
 #these function requires some tidyverse elements 
 
-source("../../funs/scoringFuns.R")
+source("../../funs/codingFuns.R")
 
 source( "../../funs/beliefcodeFun.R")
 source( "../../funs/beliefscoreFun.R")
@@ -27,11 +27,17 @@ source( "../../funs/beliefscoreFun.R")
 
 ```
 
+The functions loaded above do multiple things.
+
+`funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
+
+`funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
+
+`funCode` and `funCode2` are functions to **code** (excuse the incorrect naming!!!) our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
+
 #### Data
 
 ```{r}
-getwd() 
-
 survey3 <- read.csv("../data/fake_data/for_scoring_coding/survey3_testdat_sc.csv")
 
 ```
@@ -63,11 +69,11 @@ cred_sincere <- paste0("cred_", cred_sincere)
 
 
 
-survey_3_coded <- funScore(survey3, cred_extent, "extent", FALSE)
+survey_3_coded <- funCode(survey3, cred_extent, "extent", FALSE)
 
-survey_3_coded <- funScore(survey_3_coded, cred_freq, "frequency", FALSE)
+survey_3_coded <- funCode(survey_3_coded, cred_freq, "frequency", FALSE)
 
-survey_3_coded <- funScore(survey_3_coded, cred_sincere, "custom", FALSE,
+survey_3_coded <- funCode(survey_3_coded, cred_sincere, "custom", FALSE,
                            custom = c(
                              "Completely Insincere",
                              "Very Insincere",
@@ -78,7 +84,7 @@ survey_3_coded <- funScore(survey_3_coded, cred_sincere, "custom", FALSE,
                              "Completely Sincere"
                            ))
 
-survey_3_coded <- funScore(survey_3_coded, cred_yesno, "yesno", FALSE)
+survey_3_coded <- funCode(survey_3_coded, cred_yesno, "yesno", FALSE)
 
 ```
 
@@ -88,7 +94,7 @@ survey_3_coded <- funScore(survey_3_coded, cred_yesno, "yesno", FALSE)
 
 cruds <- colnames(survey_3_coded %>% select(starts_with("crud_")))
 
-survey_3_coded <- funScore(survey_3_coded, cruds, "extent", FALSE)
+survey_3_coded <- funCode(survey_3_coded, cruds, "extent", FALSE)
 
 ```
 
@@ -98,7 +104,7 @@ survey_3_coded <- funScore(survey_3_coded, cruds, "extent", FALSE)
 
 nts <- colnames(survey_3_coded %>% select(starts_with("nts_")))
 
-survey_3_coded <- funScore(survey_3_coded, nts, "extent", FALSE)
+survey_3_coded <- funCode(survey_3_coded, nts, "extent", FALSE)
 
 ```
 
@@ -108,7 +114,7 @@ survey_3_coded <- funScore(survey_3_coded, nts, "extent", FALSE)
 
 norm <- colnames(survey_3_coded %>% select(starts_with("norm_")))
 
-survey_3_coded <- funScore(survey_3_coded, norm, "extent", FALSE)
+survey_3_coded <- funCode(survey_3_coded, norm, "extent", FALSE)
 
 ```
 
@@ -118,7 +124,7 @@ survey_3_coded <- funScore(survey_3_coded, norm, "extent", FALSE)
 
 emph <- colnames(survey_3_coded %>% select(starts_with("re_")))
 
-survey_3_coded <- funScore(survey_3_coded, emph, "extent", FALSE)
+survey_3_coded <- funCode(survey_3_coded, emph, "extent", FALSE)
 
 ```
 

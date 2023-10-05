@@ -19,7 +19,7 @@ groundhog.library(libs, "2023-09-23")
 #load functions
 #these functions require some tidyverse elements
 
-source("../../funs/scoringFuns.R")  #these functions require some tidyverse elements
+source("../../funs/codingFuns.R")  #these functions require some tidyverse elements
 source( "../../funs/beliefcodeFun.R")
 source( "../../funs/beliefscoreFun.R")
 
@@ -31,7 +31,7 @@ The functions loaded above do multiple things.
 
 `funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
 
-`funScore` and `funScore2` are functions to **code** (excuse the incorrect naming!!!) our survey responses, ready for scoring. funScore will score numerically, and funScore2 will create factors.
+`funCode` and `funCode2` are functions to **code** (excuse the incorrect naming!!!) our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
 
 #### Data
 
@@ -57,7 +57,7 @@ anthcols <- colnames(survey5 %>% select(starts_with("anth_")))
 
 # code
 
-survey_5_coded <- funScore(survey5, anthcols, "agreement", FALSE)
+survey_5_coded <- funCode(survey5, anthcols, "agreement", FALSE)
 
 ```
 
@@ -87,7 +87,7 @@ mntcols <- colnames(survey_5_coded %>%
 
 # code
 
-survey_5_coded <- funScore(df = survey_5_coded,
+survey_5_coded <- funCode(df = survey_5_coded,
                            cols = mntcols,
                            responsescale = "custom",
                            reverse = FALSE,
@@ -96,7 +96,7 @@ survey_5_coded <- funScore(df = survey_5_coded,
 
 
 
-survey_5_coded <- funScore(df = survey_5_coded,
+survey_5_coded <- funCode(df = survey_5_coded,
                            cols = mntcolsrev,
                            responsescale = "custom",
                            reverse = TRUE,
@@ -125,13 +125,13 @@ duacols <- colnames(survey_5_coded %>%
 
 #normal
 
-survey_5_coded <- funScore(survey_5_coded,
+survey_5_coded <- funCode(survey_5_coded,
                            duacols,
                            "agreement",
                            FALSE)
 #reversed
 
-survey_5_coded <- funScore(survey_5_coded,
+survey_5_coded <- funCode(survey_5_coded,
                            duacolsrev,
                            "agreement",
                            TRUE)
@@ -154,7 +154,7 @@ ppcols <- colnames(survey_5_coded %>%
 
 # code
 
-survey_5_coded <- funScore(df = survey_5_coded,
+survey_5_coded <- funCode(df = survey_5_coded,
                            cols = ppcols,
                            responsescale = "custom",
                            reverse = FALSE,
@@ -177,7 +177,7 @@ telcols <- colnames(survey_5_coded %>%
 
 #normal
 
-survey_5_coded <- funScore(survey_5_coded,
+survey_5_coded <- funCode(survey_5_coded,
                telcols, 
                "agreement", 
                FALSE)
@@ -199,7 +199,7 @@ szcols <- colnames(survey_5_coded %>%
 
 #normal
 
-survey_5_coded <- funScore(survey_5_coded,
+survey_5_coded <- funCode(survey_5_coded,
                              szcols, 
                              "yesno", 
                              FALSE)
@@ -228,7 +228,7 @@ vvicols <- colnames(survey_5_coded %>%
 
 #code
 
-survey_5_coded <- funScore(df = survey_5_coded,
+survey_5_coded <- funCode(df = survey_5_coded,
                            cols = vvicols,
                            responsescale = "custom",
                            reverse = FALSE,
