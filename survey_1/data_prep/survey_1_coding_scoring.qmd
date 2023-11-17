@@ -28,7 +28,7 @@ The functions loaded above do multiple things.
 
 `funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
 
-`funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
+`funBeliefScore` does a similar thing but scores variables and defines them according to their final definitions for analysis.
 
 `funCode` and `funCode2` are functions to **code** our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
 
@@ -129,6 +129,8 @@ survey_1_scored <- survey1_coded %>%
 survey_1_scored <- funBeliefScore(survey_1_scored)
 
 # test <- survey_1_scored %>% select(issp_02, agnosticism_bin)  #example test line to check vars *before* select()
+
+# test_naturalism <- survey_1_scored %>% select(c(afterlife_exist:evil_eye), naturalism)  #example to test coding for naturalism in funBeliefScore. naturalism is defined as a dummy variable = 0 for cases where any of snb items (except 16, 17) are > 4 (neither agree nor disagree. Thus, rows where all cases are 4 should still be coded as 1, but this is not the case currently. See beliefscoreFun.R commits for potential solution
 ```
 
 ## Select Variables For Final Data

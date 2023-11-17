@@ -71,8 +71,8 @@ funBeliefScore <- function(df){
       # Naturalism  - NEEDS TESTING
 
       naturalism = case_when(
-        rowSums(across(all_of(snb_cols), ~grepl("Strongly Disagree |Moderately Disagree | Slightly Disagree", .))) > 0 ~ 1, 
-        TRUE ~ 0),
+        rowSums(across(all_of(snb_cols), ~. %in% c("Slightly Agree", "Moderately Agree", "Strongly Agree")) > 0) > 0 ~ 0, 
+        TRUE ~ 1),
       
       # Afterlife Existence
       afterlife_exist = snb_01,
