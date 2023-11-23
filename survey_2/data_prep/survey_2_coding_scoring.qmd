@@ -32,7 +32,7 @@ The functions loaded above do multiple things.
 
 `funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
 
-`funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
+`funBeliefScore` does a similar thing but scores variables and defines them according to their final definitions for analysis.
 
 `funCode` and `funCode2` are functions to **code** our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
 
@@ -84,39 +84,39 @@ Thinking style variables are coded as correct, incorrect, or incorrect intuitive
 
 #e.g.,
 
-unq_resp_ts_01 <- unique(df$ts_01)
+unq_resp_crt_01 <- unique(df$crt_01)
 
 
 # We would then specify what will count as correct,incorrect, incorrect intuitive
 
 #for example
 
-correct_ts01 <- c("Second",
+correct_crt01 <- c("Second",
                    "second",
                    "secnd",
                    "2nd", 
                    "2")
 
-intuitive_ts01 <- c("first",
+intuitive_crt01 <- c("first",
                     "1st", 
                     "1", 
                     "frst")
 
 # We then specify
 
-tsqs <- colnames( survey2 %>%
-  select(starts_with("ts_"))) 
+crtqs <- colnames( survey2 %>%
+  select(starts_with("crt_"))) #COMMENT VANIA: the elements in this vector would be "crt_01", "crt_02", "crt_03", etc. So when the loop is ran, the first i in crtqs would be crt_01. My understanding is that, for this first element as an example, the new column name from mutate would then be crt_crt_01. Similarly, when using %in% to see if the column contains the correct or incorrect intuitive answers, the vectors that are checked against would be correct_crt_crt_01 and intuitive_crt_crt_01 instead of correct_crt01 and intuitive_crt01. So would it not be necessary to either change the for loop or remove "crt_" from the elements in crtqs?
 
 
-# We could then loop over all ts_ columns, and check that column against its respective correct and intuitive responses.
+# We could then loop over all crt_ columns, and check that column against its respective correct and intuitive responses.
   
-for (i in tsqs){
+for (i in crtqs){
   
   survey2_coded <- survey2_coded %>% 
     mutate(
-      !!paste0("ts_", i) := case_when(
-        . %in% !!paste0("correct_ts", i) ~ "correct",
-        . %in% !!paste0("intuitive_ts", i) ~ "incorrect intuitive",
+      !!paste0("crt_", i) := case_when(
+        . %in% !!paste0("correct_crt", i) ~ "correct",
+        . %in% !!paste0("intuitive_crt", i) ~ "incorrect intuitive",
         TRUE ~ "incorrect")
     )
 }
@@ -131,18 +131,24 @@ Non-verbal uses a unique scoring scheme
 
 ## Moralisation of Rationality
 
-Moralisation of Rationality items use the standard scoring scheme so we can use the funCode function. There is no reverse coding.
+Moralisation of Rationality items use the standard scoring scheme so we can use the funCode function. 
 
 ```{r}
 
-# get cols
+#first we specify cols to be reverse coded
 
-mor_cols <- colnames(survey2_coded %>%
-  select(starts_with("mor_")))
+mor_rev <- c("08", "09")
+
+mor_cols_rev <- paste0("mor_", mor_rev)
+
+mor_cols <- colnames( survey2_coded%>%
+  select(starts_with("mor_")) %>%
+  select(-ends_with((mor_rev))))
 
 # code!
 
 survey2_coded <- funCode(survey2_coded, mor_cols, "agreement", FALSE)
+survey2_coded <- funCode(survey2_coded, mor_cols_rev, "agreement", TRUE)
 
 
 ```
@@ -196,11 +202,11 @@ survey_2_scored <- survey2_coded %>%
     
     # Cognitive Style (correct) -- NEEDS TESTING
     
-#   crt_correct <- rowSums((across(starts_with("at_") == "correct")))/ length(starts_with("at_")),
+#   crt_correct <- rowSums((across(starts_with("crt_") == "correct")))/ length(starts_with("crt_")),
     
     # Cognitive Style (intuitive)
 
-#   crt_intuitive <- rowSums((across(starts_with("at_") == "correct")))/ length(starts_with("at_")),
+#   crt_intuitive <- rowSums((across(starts_with("crt_") == "incorrect intuitive")))/ length(starts_with("crt_")),
 
     # Non-verbal Reasoning
 
