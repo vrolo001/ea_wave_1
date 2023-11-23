@@ -31,7 +31,7 @@ The functions loaded above do multiple things.
 
 `funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
 
-`funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
+`funBeliefScore` does a similar thing but scores variables and defines them according to their final definitions for analysis.
 
 `funCode` and `funCode2` are functions to **code** (excuse the incorrect naming!!!) our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
 
@@ -67,7 +67,7 @@ cred_freq <- paste0("cred_", cred_freq)
 cred_sincere <- c("10", "12", "19", "21", "28", "31")
 cred_sincere <- paste0("cred_", cred_sincere)
 
-
+# run the coding script - in the first instance on survey3, thereafter survey_3_coded
 
 survey_3_coded <- funCode(survey3, cred_extent, "extent", FALSE)
 
@@ -108,7 +108,7 @@ survey_3_coded <- funCode(survey_3_coded, nts, "extent", FALSE)
 
 ```
 
-### Normativity
+### Normativity of Religion
 
 ```{r}
 
@@ -155,7 +155,7 @@ Here we score the needed columns into the final variables, and rename the questi
 
 ```{r}
 
-# Cognitive Styles Variables
+# Socialisation Variables
 
 survey_3_scored <- survey_3_coded %>%
   mutate(
@@ -163,18 +163,18 @@ survey_3_scored <- survey_3_coded %>%
     cred_caregiver = rowMeans(across(c("cred_01", "cred_02", "cred_03", "cred_04", "cred_05", "cred_06"))), 
     
     #CRED (group leader)
-    cred_grp_leader = rowMeans(across(c("cred_10", "cred_11", "cred_19", "cred_20"))), 
+    cred_group_ldr = rowMeans(across(c("cred_10", "cred_11", "cred_19", "cred_20"))), 
     
     #CRED (group member)
-    cred_grp_mbr = rowMeans(across(c("cred_12", "cred_13", "cred_14", "cred_15", "cred_16", "cred_21", "cred_22", "cred_23", "cred_24"))),
+    cred_group_mbr = rowMeans(across(c("cred_12", "cred_13", "cred_14", "cred_15", "cred_16", "cred_21", "cred_22", "cred_23", "cred_24", "cred_25"))),
     
     #CRED (group)
     
-    cred_grp = rowMeans(across(c("cred_grp_mbr", "cred_grp_leader"))),
+    cred_group = rowMeans(across(c("cred_group_mbr", "cred_group_ldr"))),
     
     #CRED Exposure
     
-    cred = rowMeans(across(c("cred_grp", "cred_caregiver"))),
+    cred = rowMeans(across(c("cred_group", "cred_caregiver"))),
     
     #CRUD (caregiver)
     
@@ -182,19 +182,19 @@ survey_3_scored <- survey_3_coded %>%
     
     #CRUD (group member)
     
-    crud_grp_mbr = crud_02,
+    crud_group_mbr = crud_02,
     
     #CRUD (group leader)
     
-    crud_grp_ldr = crud_03, 
+    crud_group_ldr = crud_03, 
     
     #CRUD (group)
     
-    crud_grp = rowMeans(across(c("crud_grp_mbr", "crud_grp_ldr"))),
+    crud_group = rowMeans(across(c("crud_group_mbr", "crud_group_ldr"))),
     
     #CRUD
     
-    crud = rowMeans(across(c("crud_grp", "crud_caregiver"))),
+    crud = rowMeans(across(c("crud_group", "crud_caregiver"))),
     
     #Non-theistic Socialisation
     
@@ -251,7 +251,7 @@ write.csv(survey_3_scored, "survey_3_scored_FAKE.csv", row.names = FALSE)
 ```{r}
 
 survey_3_vars <- survey_3_scored %>%
-  select(1, 2, 3, 4, 100:157, -apx1, -apx2)
+  select(2, 3, 4, 5, 100:157, -apx1, -apx2) #VANIA COMMENT: fake data for survey 3 has an extra column in the beginning. Order of first columns goes X, ID, sex, age, country, while surveys 1 and 2 have not had X. If column X was added erroneously to the fake data and will not actually exist in the real surveys, then selected columns will be select (1, 2, 3, 4, 100:157). 
 
 ```
 
