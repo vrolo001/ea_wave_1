@@ -114,7 +114,7 @@ funBeliefCode <- function(dat) {
     "I’ve had an experience like this, but I didn’t associate it with a spiritual force.",
     "No, I’ve never had an experience like this.")
     
-  dat <- funCode2(dat, snb_cols, "agreement", ordered = TRUE)
+  dat <- funCode(dat, snb_cols, "agreement", reverse = FALSE)
   
   dat <- funCode2(dat, "snb_16", "custom", snb_16_levels)
   
@@ -126,7 +126,7 @@ funBeliefCode <- function(dat) {
   gb_cols <- colnames(dat %>%
                         select(starts_with(c("belief", "conf_", "ar_", "apth_", "agn_", "mean_"))))
   
-  dat <- funCode2(dat, gb_cols, "agreement", ordered = TRUE)
+  dat <- funCode(dat, gb_cols, "agreement", reverse = FALSE)
   
   
 # Atheist Membership
