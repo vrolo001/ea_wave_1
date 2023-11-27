@@ -30,11 +30,11 @@ source( "../../funs/beliefscoreFun.R")
 
 The functions loaded above do multiple things.
 
-funBeliefCode is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
+`funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
 
-funBeliefCode does a similar thing but scores variables and defines them according to their final definitions for analysis.
+`funBeliefScore` does a similar thing but scores variables and defines them according to their final definitions for analysis.
 
-funCode and funCode2 are functions to code our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
+`funCode` and `funCode2` are functions to **code** our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
 
 #### Data
 
@@ -97,14 +97,24 @@ survey_4_coded <- funCode(survey_4_coded, escols, "frequency", FALSE)
 
 #Social Security, Wealth Inequality, Social Trust
 
-#cols
+# VANIA COMMENT: wi_01, st_02 need reverse scoring if higher scores correspond to higher wealth inequality and higher social trust, respectively. Item st_01 currently also needs proofreading (it is currently "most people can be trusted or that you need to be very careful in dealing with people") and might need reverse scoring as well depending on how it is proofread
 
-sswist <- colnames(
-  survey_4_coded %>% select(starts_with(c("wi_", "st_", "ss_"))))
+#get reversed cols
 
-#coding
+sswist_colsrev <- c("wi_01", "st_02")
 
-survey_4_coded <- funCode(survey_4_coded, sswist, "agreement", FALSE)
+#get non reversed cols
+
+sswist_cols <- colnames(
+  survey_4_coded %>% 
+    select(starts_with(c("wi_", "st_", "ss_"))) %>%
+             select(-ends_with(sswist_colsrev)))
+
+#coding normal items
+survey_4_coded <- funCode(survey_4_coded, sswist_cols, "agreement", FALSE)
+
+#coding reversed items
+survey_4_coded <- funCode(survey_4_coded, sswist_colsrev, "agreement", TRUE)
 
 ```
 
@@ -139,7 +149,6 @@ survey_4_coded <- funCode(survey_4_coded, nfscolsrev, "agreement", TRUE)
 Death Anxiety is coded on our standard agreement scale and has no reversed items.
 
 ```{r}
-
 
 dacols <- colnames(survey_4_coded %>% select(starts_with("da_")))
 
@@ -193,7 +202,6 @@ Ok, assuming we now have a column where elements are separated by a comma we mov
 We use sns_01 here assuming no changes were needed in the prior chunk, but switch the varname if needed.
 
 ```{r, eval=FALSE}
-
 
 #now we create a new column sns_lst, which splits the column by comma..
 
@@ -252,7 +260,6 @@ survey_4_coded <- funCode(survey_4_coded, nfmcolsrev, "agreement", TRUE)
 
 ```
 
-
 The Meaning in Life questionnaire has truth responses and some reverse coding.
 
 ### Meaning in Life:
@@ -261,7 +268,7 @@ The Meaning in Life questionnaire has truth responses and some reverse coding.
 
 #reverse items
 
-mlqrev <- c("01", "04", "05", "06",  "09")
+mlqrev <- c("09")
 
 mlqcolsrev <- paste0("mlq_", mlqrev)
 
@@ -417,10 +424,10 @@ survey_4_scored <- survey_4_coded %>%
     digust_core = rowSums(across(paste0("ds_", sprintf("%02d",c(1, 2, 3, 4, 5, 12, 14, 15, 16, 17, 18, 23))))),
 
     #Disgust Sensitivity (animal)
-    digust_animal = rowSums(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))),
+    digust_animal = rowSums(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13, 19, 20, 21))))),
 
     #Disgust Sensitivity (contamination)
-    digust_animal = rowSums(across(paste0("ds_", sprintf("%02d",c(6, 7, 8, 9, 13,19,20))))))
+    digust_contamin = rowSums(across(paste0("ds_", sprintf("%02d",c(10, 11, 22, 24, 25))))))
 
 
 # Belief measures
@@ -441,7 +448,7 @@ write.csv(survey_4_scored, "survey_4_scored_FAKE.csv", row.names = FALSE)
 ```{r}
 
 survey_4_vars <- survey_4_scored %>%
-  select(1, 2, 3, 4, 145:197, -apx1, -apx2)
+  select(1, 2, 3, 4, 145:198, -apx1, -apx2)
 
 ```
 
