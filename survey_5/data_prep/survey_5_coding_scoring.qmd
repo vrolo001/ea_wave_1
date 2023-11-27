@@ -29,7 +29,7 @@ The functions loaded above do multiple things.
 
 `funBeliefCode` is a function to code our belief measures. This automates the scoring of the belief measures that are the same across the surveys. This just takes a dataframe as its only argument.
 
-`funBeliefCode` does a similar thing but scores variables and defines them according to their final definitions for analysis.
+`funBeliefScore` does a similar thing but scores variables and defines them according to their final definitions for analysis.
 
 `funCode` and `funCode2` are functions to **code** (excuse the incorrect naming!!!) our survey responses, ready for scoring. funCode will score numerically, and funCode2 will create factors.
 
@@ -66,14 +66,7 @@ survey_5_coded <- funCode(survey5, anthcols, "agreement", FALSE)
 Mentalizing uses a custom response scale and has some reverse coding
 
 ```{r}
-# response scale
-
-mntresps <-
-  c("Definitely Disagree",
-    "Slightly Disagree",
-    "Slightly  Agree",
-    "Definitely  Agree")
-
+#VANIA COMMENT: funCode assigns values 1 to 4 to mnt items, but codebook shows different coding. Both disagree responses should be coded as 0, while "Slightly Agree" should be coded as 1 and "Definitely Agree" as 2. Replaced earlier code with what I think is appropriate. IMPORTANTLY, "Slightly Agree" and "Definitely Agree" have an extra space between words in the fake data, so at first the code was failing to recode these until I added the str_replace_all statement and it drove me nuts figuring out what was wrong. Must check if real survey is making this same mistake of having double spaces between words.
 
 # columns
 
@@ -85,23 +78,29 @@ mntcols <- colnames(survey_5_coded %>%
                       select(starts_with("mnt_")) %>%
                       select(-ends_with((mntrev))))
 
-# code
+#define normal and reverse scoring
 
-survey_5_coded <- funCode(df = survey_5_coded,
-                           cols = mntcols,
-                           responsescale = "custom",
-                           reverse = FALSE,
-                           custom = mntresps
-)
+mnt_norm <- function(x) {
+  #x <- str_replace_all(x, "\\s{2,}", " ")  # Replace multiple consecutive spaces with a single space
+  x <- recode(x, "Definitely Disagree" = 0,
+                  "Slightly Disagree" = 0,
+                  "Slightly Agree" = 1,
+                  "Definitely Agree" = 2)}
 
 
+mnt_rev <- function(x) {
+  #x <- str_replace_all(x, "\\s{2,}", " ")  # Replace multiple consecutive spaces with a single space
+  x <- recode(x, "Definitely Disagree" = 2,
+                  "Slightly Disagree" = 1,
+                  "Slightly Agree" = 0,
+                  "Definitely Agree" = 0)}
 
-survey_5_coded <- funCode(df = survey_5_coded,
-                           cols = mntcolsrev,
-                           responsescale = "custom",
-                           reverse = TRUE,
-                           custom = mntresps
-)
+#coding
+
+survey_5_coded <- survey_5_coded %>%
+  mutate(across(all_of(mntcols), mnt_norm)) %>%
+  mutate(across(all_of(mntcolsrev), mnt_rev))
+
 ```
 
 ### Dualism
@@ -186,7 +185,7 @@ survey_5_coded <- funCode(survey_5_coded,
 
 ## Schizotypy
 
-Standard agreement scale, no reverse coding
+Standard Yes/No scale, no reverse coding
 
 ```{r}
 
